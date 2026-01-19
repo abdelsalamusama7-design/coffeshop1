@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Search, Eye, Printer, Download, FileText, X } from "lucide-react";
+import { Plus, Search, Eye, Printer, Download, FileText, X, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -27,92 +27,58 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import InvoicePrint from "@/components/invoices/InvoicePrint";
+import { useInvoices, Invoice } from "@/hooks/useInvoices";
+import { useProducts } from "@/hooks/useProducts";
+import { useCustomers } from "@/hooks/useCustomers";
 
-interface InvoiceItem {
+interface NewInvoiceItem {
   name: string;
   qty: number;
   price: number;
 }
 
-interface Invoice {
-  id: string;
-  customer: string;
-  date: string;
-  total: number;
-  status: "paid" | "pending" | "overdue";
-  items: InvoiceItem[];
-  tax: number;
-  discount: number;
-}
-
-const initialInvoices: Invoice[] = [
-  { id: "INV-2024-001", customer: "محمد أحمد", date: "2024-01-15", total: 2500, status: "paid", items: [{ name: "كاميرا Hikvision 4MP", qty: 2, price: 450 }, { name: "DVR 4 قنوات", qty: 1, price: 650 }, { name: "كابل RG59", qty: 3, price: 150 }], tax: 375, discount: 0 },
-  { id: "INV-2024-002", customer: "شركة الأمان للحراسات", date: "2024-01-14", total: 15000, status: "pending", items: [{ name: "كاميرا Hikvision 8MP", qty: 10, price: 850 }, { name: "NVR 8 قنوات", qty: 2, price: 1200 }, { name: "هارد ديسك 2TB", qty: 4, price: 350 }], tax: 2250, discount: 500 },
-  { id: "INV-2024-003", customer: "أحمد السعيد", date: "2024-01-13", total: 3200, status: "paid", items: [{ name: "DVR 8 قنوات", qty: 2, price: 950 }, { name: "محول طاقة 12V", qty: 10, price: 25 }], tax: 480, discount: 0 },
-  { id: "INV-2024-004", customer: "مؤسسة النور التجارية", date: "2024-01-12", total: 8700, status: "overdue", items: [{ name: "كاميرا Hikvision 4MP", qty: 8, price: 450 }, { name: "DVR 16 قناة", qty: 2, price: 1450 }, { name: "كابل Cat6", qty: 5, price: 320 }], tax: 1305, discount: 200 },
-  { id: "INV-2024-005", customer: "خالد العمري", date: "2024-01-11", total: 1800, status: "paid", items: [{ name: "كاميرا Hikvision 4MP", qty: 4, price: 450 }], tax: 270, discount: 0 },
-];
-
-const statusLabels = {
+const statusLabels: Record<string, string> = {
   paid: "مدفوعة",
   pending: "معلقة",
   overdue: "متأخرة",
 };
 
-const statusStyles = {
+const statusStyles: Record<string, string> = {
   paid: "bg-success/10 text-success",
   pending: "bg-warning/10 text-warning",
   overdue: "bg-destructive/10 text-destructive",
 };
 
-const customers = [
-  "محمد أحمد",
-  "شركة الأمان للحراسات",
-  "أحمد السعيد",
-  "مؤسسة النور التجارية",
-  "خالد العمري",
-];
-
-const products = [
-  { name: "كاميرا Hikvision 4MP Dome", price: 450 },
-  { name: "كاميرا Hikvision 8MP Bullet", price: 850 },
-  { name: "DVR 4 قنوات", price: 650 },
-  { name: "DVR 8 قنوات", price: 950 },
-  { name: "DVR 16 قناة", price: 1450 },
-  { name: "NVR 8 قنوات PoE", price: 1200 },
-  { name: "كابل RG59 - 305م", price: 280 },
-  { name: "كابل Cat6 - 305م", price: 320 },
-  { name: "محول طاقة 12V 2A", price: 25 },
-  { name: "هارد ديسك 2TB", price: 350 },
-];
-
 const Invoices = () => {
-  const [invoices, setInvoices] = useState<Invoice[]>(initialInvoices);
+  const { invoices, loading, addInvoice } = useInvoices();
+  const { products } = useProducts();
+  const { customers } = useCustomers();
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [showPrintPreview, setShowPrintPreview] = useState(false);
   const [newInvoice, setNewInvoice] = useState({
     customer: "",
-    items: [] as InvoiceItem[],
+    customer_id: "",
+    items: [] as NewInvoiceItem[],
     discount: 0,
   });
-  const [newItem, setNewItem] = useState({ name: "", qty: 1, price: 0 });
+  const [newItem, setNewItem] = useState({ name: "", qty: 1, price: 0, product_id: "" });
   const printRef = useRef<HTMLDivElement>(null);
 
   const filteredInvoices = invoices.filter(
     (invoice) =>
-      invoice.id.includes(searchTerm) ||
-      invoice.customer.includes(searchTerm)
+      invoice.invoice_number.includes(searchTerm) ||
+      invoice.customer_name.includes(searchTerm)
   );
 
   const handleAddItem = () => {
     if (newItem.name && newItem.qty > 0 && newItem.price > 0) {
       setNewInvoice({
         ...newInvoice,
-        items: [...newInvoice.items, newItem],
+        items: [...newInvoice.items, { name: newItem.name, qty: newItem.qty, price: newItem.price }],
       });
-      setNewItem({ name: "", qty: 1, price: 0 });
+      setNewItem({ name: "", qty: 1, price: 0, product_id: "" });
     }
   };
 
@@ -123,10 +89,17 @@ const Invoices = () => {
     });
   };
 
-  const handleProductSelect = (productName: string) => {
-    const product = products.find((p) => p.name === productName);
+  const handleProductSelect = (productId: string) => {
+    const product = products.find((p) => p.id === productId);
     if (product) {
-      setNewItem({ ...newItem, name: product.name, price: product.price });
+      setNewItem({ ...newItem, name: product.name, price: product.price, product_id: product.id });
+    }
+  };
+
+  const handleCustomerSelect = (customerId: string) => {
+    const customer = customers.find((c) => c.id === customerId);
+    if (customer) {
+      setNewInvoice({ ...newInvoice, customer: customer.name, customer_id: customer.id });
     }
   };
 
@@ -142,20 +115,23 @@ const Invoices = () => {
     return calculateSubtotal() - newInvoice.discount + calculateTax();
   };
 
-  const handleCreateInvoice = () => {
+  const handleCreateInvoice = async () => {
     if (newInvoice.customer && newInvoice.items.length > 0) {
-      const invoice: Invoice = {
-        id: `INV-2024-${String(invoices.length + 1).padStart(3, "0")}`,
-        customer: newInvoice.customer,
-        date: new Date().toISOString().split("T")[0],
-        total: calculateTotal(),
-        status: "pending",
-        items: newInvoice.items,
-        tax: calculateTax(),
+      await addInvoice({
+        customer_id: newInvoice.customer_id || undefined,
+        customer_name: newInvoice.customer,
+        subtotal: calculateSubtotal(),
         discount: newInvoice.discount,
-      };
-      setInvoices([invoice, ...invoices]);
-      setNewInvoice({ customer: "", items: [], discount: 0 });
+        tax: calculateTax(),
+        total: calculateTotal(),
+        items: newInvoice.items.map((item) => ({
+          product_name: item.name,
+          quantity: item.qty,
+          unit_price: item.price,
+          total: item.qty * item.price,
+        })),
+      });
+      setNewInvoice({ customer: "", customer_id: "", items: [], discount: 0 });
       setIsDialogOpen(false);
     }
   };
@@ -172,6 +148,32 @@ const Invoices = () => {
   const handleDownloadPDF = () => {
     window.print();
   };
+
+  // Convert Invoice to format expected by InvoicePrint
+  const convertToInvoicePrintFormat = (invoice: Invoice) => ({
+    id: invoice.invoice_number,
+    customer: invoice.customer_name,
+    date: new Date(invoice.created_at).toLocaleDateString("ar-SA"),
+    total: invoice.total,
+    status: invoice.status,
+    items: (invoice.items || []).map((item) => ({
+      name: item.product_name,
+      qty: item.quantity,
+      price: item.unit_price,
+    })),
+    tax: invoice.tax,
+    discount: invoice.discount,
+  });
+
+  if (loading) {
+    return (
+      <MainLayout title="إدارة الفواتير" subtitle="إنشاء وإدارة فواتير البيع">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout title="إدارة الفواتير" subtitle="إنشاء وإدارة فواتير البيع">
@@ -196,7 +198,7 @@ const Invoices = () => {
               </div>
             </div>
             <div ref={printRef}>
-              <InvoicePrint invoice={selectedInvoice} />
+              <InvoicePrint invoice={convertToInvoicePrintFormat(selectedInvoice)} />
             </div>
           </div>
         </div>
@@ -229,19 +231,14 @@ const Invoices = () => {
               {/* Customer Selection */}
               <div className="space-y-2">
                 <Label>اختر العميل</Label>
-                <Select
-                  value={newInvoice.customer}
-                  onValueChange={(value) =>
-                    setNewInvoice({ ...newInvoice, customer: value })
-                  }
-                >
+                <Select onValueChange={handleCustomerSelect}>
                   <SelectTrigger>
                     <SelectValue placeholder="اختر العميل" />
                   </SelectTrigger>
                   <SelectContent>
                     {customers.map((customer) => (
-                      <SelectItem key={customer} value={customer}>
-                        {customer}
+                      <SelectItem key={customer.id} value={customer.id}>
+                        {customer.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -258,7 +255,7 @@ const Invoices = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {products.map((product) => (
-                        <SelectItem key={product.name} value={product.name}>
+                        <SelectItem key={product.id} value={product.id}>
                           {product.name} - {product.price} ر.س
                         </SelectItem>
                       ))}
@@ -374,59 +371,69 @@ const Invoices = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredInvoices.map((invoice) => (
-              <TableRow key={invoice.id} className="table-row-hover">
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <FileText className="w-5 h-5 text-primary" />
-                    </div>
-                    <span className="font-medium">{invoice.id}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="font-medium">{invoice.customer}</TableCell>
-                <TableCell className="text-muted-foreground">{invoice.date}</TableCell>
-                <TableCell>{invoice.items.length} أصناف</TableCell>
-                <TableCell className="font-bold">{invoice.total.toLocaleString()} ر.س</TableCell>
-                <TableCell>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      statusStyles[invoice.status]
-                    }`}
-                  >
-                    {statusLabels[invoice.status]}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-1">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8"
-                      onClick={() => handlePrint(invoice)}
-                    >
-                      <Eye className="w-4 h-4 text-muted-foreground" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8"
-                      onClick={() => handlePrint(invoice)}
-                    >
-                      <Printer className="w-4 h-4 text-muted-foreground" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8"
-                      onClick={() => handlePrint(invoice)}
-                    >
-                      <Download className="w-4 h-4 text-muted-foreground" />
-                    </Button>
-                  </div>
+            {filteredInvoices.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  لا توجد فواتير. قم بإنشاء فاتورة جديدة.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredInvoices.map((invoice) => (
+                <TableRow key={invoice.id} className="table-row-hover">
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-primary" />
+                      </div>
+                      <span className="font-medium">{invoice.invoice_number}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="font-medium">{invoice.customer_name}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {new Date(invoice.created_at).toLocaleDateString("ar-SA")}
+                  </TableCell>
+                  <TableCell>{invoice.items?.length || 0} أصناف</TableCell>
+                  <TableCell className="font-bold">{invoice.total.toLocaleString()} ر.س</TableCell>
+                  <TableCell>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        statusStyles[invoice.status] || statusStyles.pending
+                      }`}
+                    >
+                      {statusLabels[invoice.status] || "معلقة"}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => handlePrint(invoice)}
+                      >
+                        <Eye className="w-4 h-4 text-muted-foreground" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => handlePrint(invoice)}
+                      >
+                        <Printer className="w-4 h-4 text-muted-foreground" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => handlePrint(invoice)}
+                      >
+                        <Download className="w-4 h-4 text-muted-foreground" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
