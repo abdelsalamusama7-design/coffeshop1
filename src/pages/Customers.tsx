@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Search, Edit, Trash2, Phone, Mail, User } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Phone, Mail, User, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -19,58 +19,78 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-
-const initialCustomers = [
-  { id: 1, name: "محمد أحمد", phone: "0501234567", email: "mohamed@example.com", balance: 2500, invoices: 12 },
-  { id: 2, name: "شركة الأمان للحراسات", phone: "0559876543", email: "info@alaman.com", balance: 0, invoices: 28 },
-  { id: 3, name: "أحمد السعيد", phone: "0541112233", email: "ahmed@example.com", balance: 3200, invoices: 8 },
-  { id: 4, name: "مؤسسة النور التجارية", phone: "0567778899", email: "sales@alnoor.com", balance: 8700, invoices: 15 },
-  { id: 5, name: "خالد العمري", phone: "0532223344", email: "khaled@example.com", balance: 0, invoices: 5 },
-  { id: 6, name: "شركة البناء الحديث", phone: "0544445566", email: "info@hadith.com", balance: 22500, invoices: 35 },
-  { id: 7, name: "عبدالله الشمري", phone: "0556667788", email: "abdullah@example.com", balance: 0, invoices: 10 },
-  { id: 8, name: "مستشفى الرعاية", phone: "0512345678", email: "procurement@hospital.com", balance: 0, invoices: 42 },
-];
+import { Textarea } from "@/components/ui/textarea";
+import { useCustomers, Customer, CustomerInput } from "@/hooks/useCustomers";
 
 const Customers = () => {
-  const [customers, setCustomers] = useState(initialCustomers);
+  const { customers, loading, addCustomer, updateCustomer, deleteCustomer } = useCustomers();
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [newCustomer, setNewCustomer] = useState({
     name: "",
     phone: "",
     email: "",
+    address: "",
+    notes: "",
   });
 
   const filteredCustomers = customers.filter(
     (customer) =>
       customer.name.includes(searchTerm) ||
-      customer.phone.includes(searchTerm) ||
-      customer.email.includes(searchTerm)
+      (customer.phone && customer.phone.includes(searchTerm)) ||
+      (customer.email && customer.email.includes(searchTerm))
   );
 
-  const handleAddCustomer = () => {
-    if (newCustomer.name && newCustomer.phone) {
-      setCustomers([
-        ...customers,
-        {
-          id: customers.length + 1,
-          name: newCustomer.name,
-          phone: newCustomer.phone,
-          email: newCustomer.email,
-          balance: 0,
-          invoices: 0,
-        },
-      ]);
-      setNewCustomer({ name: "", phone: "", email: "" });
+  const handleAddCustomer = async () => {
+    if (newCustomer.name) {
+      const customerData: CustomerInput = {
+        name: newCustomer.name,
+        phone: newCustomer.phone || undefined,
+        email: newCustomer.email || undefined,
+        address: newCustomer.address || undefined,
+        notes: newCustomer.notes || undefined,
+      };
+
+      if (editingCustomer) {
+        await updateCustomer(editingCustomer.id, customerData);
+      } else {
+        await addCustomer(customerData);
+      }
+
+      setNewCustomer({ name: "", phone: "", email: "", address: "", notes: "" });
+      setEditingCustomer(null);
       setIsDialogOpen(false);
     }
   };
 
-  const handleDeleteCustomer = (id: number) => {
-    setCustomers(customers.filter((c) => c.id !== id));
+  const handleEditCustomer = (customer: Customer) => {
+    setEditingCustomer(customer);
+    setNewCustomer({
+      name: customer.name,
+      phone: customer.phone || "",
+      email: customer.email || "",
+      address: customer.address || "",
+      notes: customer.notes || "",
+    });
+    setIsDialogOpen(true);
+  };
+
+  const handleDeleteCustomer = async (id: string) => {
+    await deleteCustomer(id);
   };
 
   const totalBalance = customers.reduce((sum, c) => sum + c.balance, 0);
+
+  if (loading) {
+    return (
+      <MainLayout title="إدارة العملاء" subtitle="عرض وإدارة بيانات العملاء">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout title="إدارة العملاء" subtitle="عرض وإدارة بيانات العملاء">
@@ -125,7 +145,13 @@ const Customers = () => {
           />
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) {
+            setEditingCustomer(null);
+            setNewCustomer({ name: "", phone: "", email: "", address: "", notes: "" });
+          }
+        }}>
           <DialogTrigger asChild>
             <Button className="gradient-primary border-0">
               <Plus className="w-4 h-4 ml-2" />
@@ -134,7 +160,7 @@ const Customers = () => {
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>إضافة عميل جديد</DialogTitle>
+              <DialogTitle>{editingCustomer ? "تعديل العميل" : "إضافة عميل جديد"}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 mt-4">
               <div className="space-y-2">
@@ -168,8 +194,29 @@ const Customers = () => {
                   placeholder="email@example.com"
                 />
               </div>
+              <div className="space-y-2">
+                <Label>العنوان</Label>
+                <Input
+                  value={newCustomer.address}
+                  onChange={(e) =>
+                    setNewCustomer({ ...newCustomer, address: e.target.value })
+                  }
+                  placeholder="أدخل العنوان"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>ملاحظات</Label>
+                <Textarea
+                  value={newCustomer.notes}
+                  onChange={(e) =>
+                    setNewCustomer({ ...newCustomer, notes: e.target.value })
+                  }
+                  placeholder="ملاحظات إضافية..."
+                  rows={2}
+                />
+              </div>
               <Button onClick={handleAddCustomer} className="w-full gradient-primary border-0">
-                إضافة العميل
+                {editingCustomer ? "حفظ التعديلات" : "إضافة العميل"}
               </Button>
             </div>
           </DialogContent>
@@ -184,61 +231,76 @@ const Customers = () => {
               <TableHead className="text-right">العميل</TableHead>
               <TableHead className="text-right">رقم الهاتف</TableHead>
               <TableHead className="text-right">البريد الإلكتروني</TableHead>
-              <TableHead className="text-right">عدد الفواتير</TableHead>
+              <TableHead className="text-right">العنوان</TableHead>
               <TableHead className="text-right">الرصيد المستحق</TableHead>
               <TableHead className="text-right">الإجراءات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredCustomers.map((customer) => (
-              <TableRow key={customer.id} className="table-row-hover">
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <User className="w-5 h-5 text-primary" />
-                    </div>
-                    <span className="font-medium">{customer.name}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Phone className="w-4 h-4" />
-                    <span>{customer.phone}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Mail className="w-4 h-4" />
-                    <span>{customer.email}</span>
-                  </div>
-                </TableCell>
-                <TableCell>{customer.invoices} فاتورة</TableCell>
-                <TableCell>
-                  <span
-                    className={`font-bold ${
-                      customer.balance > 0 ? "text-warning" : "text-success"
-                    }`}
-                  >
-                    {customer.balance.toLocaleString()} ر.س
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <Edit className="w-4 h-4 text-muted-foreground" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => handleDeleteCustomer(customer.id)}
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </Button>
-                  </div>
+            {filteredCustomers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  لا يوجد عملاء. قم بإضافة عميل جديد.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredCustomers.map((customer) => (
+                <TableRow key={customer.id} className="table-row-hover">
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <User className="w-5 h-5 text-primary" />
+                      </div>
+                      <span className="font-medium">{customer.name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Phone className="w-4 h-4" />
+                      <span>{customer.phone || "-"}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Mail className="w-4 h-4" />
+                      <span>{customer.email || "-"}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {customer.address || "-"}
+                  </TableCell>
+                  <TableCell>
+                    <span
+                      className={`font-bold ${
+                        customer.balance > 0 ? "text-warning" : "text-success"
+                      }`}
+                    >
+                      {customer.balance.toLocaleString()} ر.س
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => handleEditCustomer(customer)}
+                      >
+                        <Edit className="w-4 h-4 text-muted-foreground" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => handleDeleteCustomer(customer.id)}
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

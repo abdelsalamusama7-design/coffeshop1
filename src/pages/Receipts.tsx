@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Search, Printer, Download, Receipt, X, Eye } from "lucide-react";
+import { Plus, Search, Printer, Download, Receipt, X, Eye, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -28,77 +28,76 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import ReceiptPrint from "@/components/receipts/ReceiptPrint";
-
-interface ReceiptData {
-  id: string;
-  customer: string;
-  amount: number;
-  date: string;
-  paymentMethod: string;
-  invoiceRef?: string;
-  notes?: string;
-}
-
-const initialReceipts: ReceiptData[] = [
-  { id: "REC-2024-001", customer: "محمد أحمد", amount: 2500, date: "2024-01-15", paymentMethod: "نقدي", invoiceRef: "INV-2024-001" },
-  { id: "REC-2024-002", customer: "أحمد السعيد", amount: 3200, date: "2024-01-13", paymentMethod: "تحويل بنكي", invoiceRef: "INV-2024-003" },
-  { id: "REC-2024-003", customer: "خالد العمري", amount: 1800, date: "2024-01-11", paymentMethod: "شبكة مدى", invoiceRef: "INV-2024-005" },
-  { id: "REC-2024-004", customer: "شركة الأمان للحراسات", amount: 5000, date: "2024-01-10", paymentMethod: "تحويل بنكي", invoiceRef: "INV-2024-002", notes: "دفعة أولى" },
-  { id: "REC-2024-005", customer: "عبدالله الشمري", amount: 4500, date: "2024-01-09", paymentMethod: "نقدي" },
-];
-
-const customers = [
-  { name: "محمد أحمد", balance: 0 },
-  { name: "شركة الأمان للحراسات", balance: 10000 },
-  { name: "أحمد السعيد", balance: 0 },
-  { name: "مؤسسة النور التجارية", balance: 8700 },
-  { name: "خالد العمري", balance: 0 },
-  { name: "شركة البناء الحديث", balance: 22500 },
-  { name: "عبدالله الشمري", balance: 0 },
-];
+import { useReceipts, Receipt as ReceiptType } from "@/hooks/useReceipts";
+import { useCustomers } from "@/hooks/useCustomers";
+import { useInvoices } from "@/hooks/useInvoices";
 
 const paymentMethods = ["نقدي", "تحويل بنكي", "شبكة مدى", "شيك"];
 
 const Receipts = () => {
-  const [receipts, setReceipts] = useState<ReceiptData[]>(initialReceipts);
+  const { receipts, loading, addReceipt } = useReceipts();
+  const { customers } = useCustomers();
+  const { invoices } = useInvoices();
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedReceipt, setSelectedReceipt] = useState<ReceiptData | null>(null);
+  const [selectedReceipt, setSelectedReceipt] = useState<ReceiptType | null>(null);
   const [showPrintPreview, setShowPrintPreview] = useState(false);
   const [newReceipt, setNewReceipt] = useState({
     customer: "",
+    customer_id: "",
     amount: "",
     paymentMethod: "",
     invoiceRef: "",
+    invoice_id: "",
     notes: "",
   });
 
   const filteredReceipts = receipts.filter(
     (receipt) =>
-      receipt.id.includes(searchTerm) ||
-      receipt.customer.includes(searchTerm)
+      receipt.receipt_number.includes(searchTerm) ||
+      receipt.customer_name.includes(searchTerm)
   );
 
   const totalReceived = receipts.reduce((sum, r) => sum + r.amount, 0);
 
-  const handleCreateReceipt = () => {
+  const handleCustomerSelect = (customerId: string) => {
+    const customer = customers.find((c) => c.id === customerId);
+    if (customer) {
+      setNewReceipt({ ...newReceipt, customer: customer.name, customer_id: customer.id });
+    }
+  };
+
+  const handleInvoiceSelect = (invoiceId: string) => {
+    const invoice = invoices.find((i) => i.id === invoiceId);
+    if (invoice) {
+      setNewReceipt({ 
+        ...newReceipt, 
+        invoiceRef: invoice.invoice_number, 
+        invoice_id: invoice.id,
+        amount: String(invoice.total),
+        customer: invoice.customer_name,
+        customer_id: invoice.customer_id || ""
+      });
+    }
+  };
+
+  const handleCreateReceipt = async () => {
     if (newReceipt.customer && newReceipt.amount && newReceipt.paymentMethod) {
-      const receipt: ReceiptData = {
-        id: `REC-2024-${String(receipts.length + 1).padStart(3, "0")}`,
-        customer: newReceipt.customer,
+      await addReceipt({
+        customer_id: newReceipt.customer_id || undefined,
+        customer_name: newReceipt.customer,
+        invoice_id: newReceipt.invoice_id || undefined,
+        invoice_number: newReceipt.invoiceRef || undefined,
         amount: Number(newReceipt.amount),
-        date: new Date().toISOString().split("T")[0],
-        paymentMethod: newReceipt.paymentMethod,
-        invoiceRef: newReceipt.invoiceRef || undefined,
+        payment_method: newReceipt.paymentMethod,
         notes: newReceipt.notes || undefined,
-      };
-      setReceipts([receipt, ...receipts]);
-      setNewReceipt({ customer: "", amount: "", paymentMethod: "", invoiceRef: "", notes: "" });
+      });
+      setNewReceipt({ customer: "", customer_id: "", amount: "", paymentMethod: "", invoiceRef: "", invoice_id: "", notes: "" });
       setIsDialogOpen(false);
     }
   };
 
-  const handlePrint = (receipt: ReceiptData) => {
+  const handlePrint = (receipt: ReceiptType) => {
     setSelectedReceipt(receipt);
     setShowPrintPreview(true);
   };
@@ -106,6 +105,27 @@ const Receipts = () => {
   const handlePrintAction = () => {
     window.print();
   };
+
+  // Convert Receipt to format expected by ReceiptPrint
+  const convertToReceiptPrintFormat = (receipt: ReceiptType) => ({
+    id: receipt.receipt_number,
+    customer: receipt.customer_name,
+    amount: receipt.amount,
+    date: new Date(receipt.created_at).toLocaleDateString("ar-SA"),
+    paymentMethod: receipt.payment_method,
+    invoiceRef: receipt.invoice_number || undefined,
+    notes: receipt.notes || undefined,
+  });
+
+  if (loading) {
+    return (
+      <MainLayout title="إيصالات القبض" subtitle="إدارة إيصالات القبض المالية">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout title="إيصالات القبض" subtitle="إدارة إيصالات القبض المالية">
@@ -129,7 +149,7 @@ const Receipts = () => {
                 </Button>
               </div>
             </div>
-            <ReceiptPrint receipt={selectedReceipt} />
+            <ReceiptPrint receipt={convertToReceiptPrintFormat(selectedReceipt)} />
           </div>
         </div>
       )}
@@ -199,18 +219,13 @@ const Receipts = () => {
             <div className="space-y-4 mt-4">
               <div className="space-y-2">
                 <Label>العميل</Label>
-                <Select
-                  value={newReceipt.customer}
-                  onValueChange={(value) =>
-                    setNewReceipt({ ...newReceipt, customer: value })
-                  }
-                >
+                <Select onValueChange={handleCustomerSelect}>
                   <SelectTrigger>
                     <SelectValue placeholder="اختر العميل" />
                   </SelectTrigger>
                   <SelectContent>
                     {customers.map((customer) => (
-                      <SelectItem key={customer.name} value={customer.name}>
+                      <SelectItem key={customer.id} value={customer.id}>
                         <div className="flex justify-between items-center w-full">
                           <span>{customer.name}</span>
                           {customer.balance > 0 && (
@@ -219,6 +234,22 @@ const Receipts = () => {
                             </span>
                           )}
                         </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>ربط بفاتورة (اختياري)</Label>
+                <Select onValueChange={handleInvoiceSelect}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر الفاتورة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {invoices.filter(i => i.status !== "paid").map((invoice) => (
+                      <SelectItem key={invoice.id} value={invoice.id}>
+                        {invoice.invoice_number} - {invoice.customer_name} ({invoice.total.toLocaleString()} ر.س)
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -260,17 +291,6 @@ const Receipts = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>رقم الفاتورة (اختياري)</Label>
-                <Input
-                  value={newReceipt.invoiceRef}
-                  onChange={(e) =>
-                    setNewReceipt({ ...newReceipt, invoiceRef: e.target.value })
-                  }
-                  placeholder="INV-2024-XXX"
-                />
-              </div>
-
-              <div className="space-y-2">
                 <Label>ملاحظات (اختياري)</Label>
                 <Textarea
                   value={newReceipt.notes}
@@ -309,59 +329,69 @@ const Receipts = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredReceipts.map((receipt) => (
-              <TableRow key={receipt.id} className="table-row-hover">
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
-                      <Receipt className="w-5 h-5 text-success" />
-                    </div>
-                    <span className="font-medium">{receipt.id}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="font-medium">{receipt.customer}</TableCell>
-                <TableCell className="text-muted-foreground">{receipt.date}</TableCell>
-                <TableCell className="font-bold text-success">
-                  +{receipt.amount.toLocaleString()} ر.س
-                </TableCell>
-                <TableCell>
-                  <span className="px-3 py-1 rounded-full bg-secondary text-secondary-foreground text-xs font-medium">
-                    {receipt.paymentMethod}
-                  </span>
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {receipt.invoiceRef || "-"}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-1">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8"
-                      onClick={() => handlePrint(receipt)}
-                    >
-                      <Eye className="w-4 h-4 text-muted-foreground" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8"
-                      onClick={() => handlePrint(receipt)}
-                    >
-                      <Printer className="w-4 h-4 text-muted-foreground" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8"
-                      onClick={() => handlePrint(receipt)}
-                    >
-                      <Download className="w-4 h-4 text-muted-foreground" />
-                    </Button>
-                  </div>
+            {filteredReceipts.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  لا توجد إيصالات. قم بإنشاء إيصال جديد.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredReceipts.map((receipt) => (
+                <TableRow key={receipt.id} className="table-row-hover">
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
+                        <Receipt className="w-5 h-5 text-success" />
+                      </div>
+                      <span className="font-medium">{receipt.receipt_number}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="font-medium">{receipt.customer_name}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {new Date(receipt.created_at).toLocaleDateString("ar-SA")}
+                  </TableCell>
+                  <TableCell className="font-bold text-success">
+                    +{receipt.amount.toLocaleString()} ر.س
+                  </TableCell>
+                  <TableCell>
+                    <span className="px-3 py-1 rounded-full bg-secondary text-secondary-foreground text-xs font-medium">
+                      {receipt.payment_method}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {receipt.invoice_number || "-"}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => handlePrint(receipt)}
+                      >
+                        <Eye className="w-4 h-4 text-muted-foreground" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => handlePrint(receipt)}
+                      >
+                        <Printer className="w-4 h-4 text-muted-foreground" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => handlePrint(receipt)}
+                      >
+                        <Download className="w-4 h-4 text-muted-foreground" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
