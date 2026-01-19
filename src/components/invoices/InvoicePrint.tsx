@@ -1,4 +1,4 @@
-import { Camera } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 interface InvoiceItem {
   name: string;
@@ -30,9 +30,7 @@ const InvoicePrint = ({ invoice }: InvoicePrintProps) => {
       <div className="flex justify-between items-start border-b-2 border-gray-300 pb-6 mb-6">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center">
-              <Camera className="w-7 h-7 text-white" />
-            </div>
+            <img src={logo} alt="المراقب" className="w-14 h-14 object-contain" />
             <div>
               <h1 className="text-2xl font-bold text-gray-900">شركة المراقب</h1>
               <p className="text-sm text-gray-600">لكاميرات المراقبة والأنظمة الأمنية</p>

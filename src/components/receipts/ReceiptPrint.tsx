@@ -1,4 +1,4 @@
-import { Camera } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 interface ReceiptData {
   id: string;
@@ -43,9 +43,7 @@ const ReceiptPrint = ({ receipt }: ReceiptPrintProps) => {
       {/* Header */}
       <div className="text-center border-b-2 border-gray-300 pb-6 mb-6">
         <div className="flex items-center justify-center gap-3 mb-4">
-          <div className="w-14 h-14 rounded-xl bg-green-600 flex items-center justify-center">
-            <Camera className="w-8 h-8 text-white" />
-          </div>
+          <img src={logo} alt="المراقب" className="w-16 h-16 object-contain" />
         </div>
         <h1 className="text-2xl font-bold text-gray-900">شركة المراقب</h1>
         <p className="text-sm text-gray-600">لكاميرات المراقبة والأنظمة الأمنية</p>
