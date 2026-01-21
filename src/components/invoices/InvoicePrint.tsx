@@ -37,10 +37,9 @@ const InvoicePrint = ({ invoice }: InvoicePrintProps) => {
             </div>
           </div>
           <div className="mt-4 text-sm text-gray-600 space-y-1">
-            <p>الرياض، حي النخيل، شارع العليا</p>
-            <p>هاتف: 0501234567</p>
-            <p>البريد: info@almoraqib.com</p>
-            <p>الرقم الضريبي: 300123456789012</p>
+            <p>ليبيا، طرابلس</p>
+            <p>هاتف: 0912345678</p>
+            <p>البريد: info@almoraqib.ly</p>
           </div>
         </div>
         <div className="text-left">
@@ -77,9 +76,9 @@ const InvoicePrint = ({ invoice }: InvoicePrintProps) => {
               <td className="py-3 px-4 border-b">{index + 1}</td>
               <td className="py-3 px-4 border-b font-medium">{item.name}</td>
               <td className="py-3 px-4 border-b text-center">{item.qty}</td>
-              <td className="py-3 px-4 border-b text-left">{item.price.toLocaleString()} ر.س</td>
+              <td className="py-3 px-4 border-b text-left">{item.price.toLocaleString()} د.ل</td>
               <td className="py-3 px-4 border-b text-left font-semibold">
-                {(item.qty * item.price).toLocaleString()} ر.س
+                {(item.qty * item.price).toLocaleString()} د.ل
               </td>
             </tr>
           ))}
@@ -91,21 +90,21 @@ const InvoicePrint = ({ invoice }: InvoicePrintProps) => {
         <div className="w-80 space-y-2">
           <div className="flex justify-between py-2 border-b">
             <span className="text-gray-600">المجموع الفرعي</span>
-            <span className="font-semibold">{subtotal.toLocaleString()} ر.س</span>
+            <span className="font-semibold">{subtotal.toLocaleString()} د.ل</span>
           </div>
           {invoice.discount > 0 && (
             <div className="flex justify-between py-2 border-b text-green-600">
               <span>الخصم</span>
-              <span className="font-semibold">- {invoice.discount.toLocaleString()} ر.س</span>
+              <span className="font-semibold">- {invoice.discount.toLocaleString()} د.ل</span>
             </div>
           )}
           <div className="flex justify-between py-2 border-b">
-            <span className="text-gray-600">ضريبة القيمة المضافة (15%)</span>
-            <span className="font-semibold">{invoice.tax.toLocaleString()} ر.س</span>
+            <span className="text-gray-600">الضريبة</span>
+            <span className="font-semibold">{invoice.tax.toLocaleString()} د.ل</span>
           </div>
           <div className="flex justify-between py-3 bg-blue-600 text-white px-4 rounded-lg">
             <span className="font-bold text-lg">الإجمالي المستحق</span>
-            <span className="font-bold text-lg">{invoice.total.toLocaleString()} ر.س</span>
+            <span className="font-bold text-lg">{invoice.total.toLocaleString()} د.ل</span>
           </div>
         </div>
       </div>
@@ -116,7 +115,6 @@ const InvoicePrint = ({ invoice }: InvoicePrintProps) => {
           <div>
             <h4 className="font-bold text-gray-700 mb-2">الشروط والأحكام</h4>
             <ul className="text-sm text-gray-600 space-y-1">
-              <li>• جميع الأسعار شاملة ضريبة القيمة المضافة</li>
               <li>• مدة الضمان سنة واحدة من تاريخ الشراء</li>
               <li>• لا يتم استرجاع أو استبدال البضاعة بعد البيع</li>
             </ul>
@@ -126,13 +124,12 @@ const InvoicePrint = ({ invoice }: InvoicePrintProps) => {
             <ul className="text-sm text-gray-600 space-y-1">
               <li>• نقداً</li>
               <li>• تحويل بنكي</li>
-              <li>• شبكة مدى</li>
             </ul>
           </div>
         </div>
         <div className="text-center mt-6 text-gray-500 text-sm">
           <p>شكراً لتعاملكم معنا</p>
-          <p>www.almoraqib.com</p>
+          <p>www.almoraqib.ly</p>
         </div>
       </div>
     </div>

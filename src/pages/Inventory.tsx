@@ -244,7 +244,7 @@ const Inventory = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>سعر البيع (ر.س)</Label>
+                      <Label>سعر البيع (د.ل)</Label>
                       <Input
                         type="number"
                         value={newProduct.price}
@@ -253,7 +253,7 @@ const Inventory = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>التكلفة (ر.س)</Label>
+                      <Label>التكلفة (د.ل)</Label>
                       <Input
                         type="number"
                         value={newProduct.cost}
@@ -328,8 +328,8 @@ const Inventory = () => {
                           {product.category}
                         </span>
                       </TableCell>
-                      <TableCell className="font-semibold">{product.price.toLocaleString()} ر.س</TableCell>
-                      <TableCell className="text-muted-foreground">{product.cost.toLocaleString()} ر.س</TableCell>
+                      <TableCell className="font-semibold">{product.price.toLocaleString()} د.ل</TableCell>
+                      <TableCell className="text-muted-foreground">{product.cost.toLocaleString()} د.ل</TableCell>
                       <TableCell>
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -400,11 +400,11 @@ const Inventory = () => {
             <div className="stat-card">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl gradient-warning flex items-center justify-center">
-                  <span className="text-lg font-bold text-primary-foreground">ر.س</span>
+                  <span className="text-lg font-bold text-primary-foreground">د.ل</span>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">قيمة المخزون</p>
-                  <p className="text-2xl font-bold">{totalValue.toLocaleString()} ر.س</p>
+                  <p className="text-2xl font-bold">{totalValue.toLocaleString()} د.ل</p>
                 </div>
               </div>
             </div>
