@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Search, Eye, Printer, Download, FileText, X, Loader2 } from "lucide-react";
+import { Plus, Search, Eye, Printer, Download, FileText, X, Loader2, ScanLine } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -27,9 +27,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import InvoicePrint from "@/components/invoices/InvoicePrint";
+import BarcodeScanner from "@/components/scanner/BarcodeScanner";
 import { useInvoices, Invoice } from "@/hooks/useInvoices";
 import { useProducts } from "@/hooks/useProducts";
 import { useCustomers } from "@/hooks/useCustomers";
+import { toast } from "sonner";
 
 interface NewInvoiceItem {
   name: string;
@@ -57,6 +59,7 @@ const Invoices = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [showPrintPreview, setShowPrintPreview] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
   const [newInvoice, setNewInvoice] = useState({
     customer: "",
     customer_id: "",
@@ -93,6 +96,21 @@ const Invoices = () => {
     const product = products.find((p) => p.id === productId);
     if (product) {
       setNewItem({ ...newItem, name: product.name, price: product.price, product_id: product.id });
+    }
+  };
+
+  const handleBarcodeScan = (code: string) => {
+    // Try to find product by SKU or name
+    const product = products.find((p) => p.sku === code || p.name === code || p.id === code);
+    if (product) {
+      // Add directly to items list with qty 1
+      setNewInvoice({
+        ...newInvoice,
+        items: [...newInvoice.items, { name: product.name, qty: 1, price: product.price }],
+      });
+      toast.success(`تم إضافة: ${product.name}`);
+    } else {
+      toast.error(`لم يتم العثور على منتج بالكود: ${code}`);
     }
   };
 
@@ -177,6 +195,14 @@ const Invoices = () => {
 
   return (
     <MainLayout title="إدارة الفواتير" subtitle="إنشاء وإدارة فواتير البيع">
+      {/* Barcode Scanner Modal */}
+      {showScanner && (
+        <BarcodeScanner
+          onScan={handleBarcodeScan}
+          onClose={() => setShowScanner(false)}
+        />
+      )}
+
       {/* Print Preview Modal */}
       {showPrintPreview && selectedInvoice && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -247,7 +273,19 @@ const Invoices = () => {
 
               {/* Add Items */}
               <div className="space-y-4">
-                <Label>إضافة الأصناف</Label>
+                <div className="flex items-center justify-between">
+                  <Label>إضافة الأصناف</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowScanner(true)}
+                    className="gap-2"
+                  >
+                    <ScanLine className="w-4 h-4" />
+                    مسح باركود
+                  </Button>
+                </div>
                 <div className="flex gap-3">
                   <Select onValueChange={handleProductSelect}>
                     <SelectTrigger className="flex-1">
