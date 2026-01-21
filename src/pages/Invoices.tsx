@@ -256,7 +256,7 @@ const Invoices = () => {
                     <SelectContent>
                       {products.map((product) => (
                         <SelectItem key={product.id} value={product.id}>
-                          {product.name} - {product.price} ر.س
+                          {product.name} - {product.price} د.ل
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -298,9 +298,9 @@ const Invoices = () => {
                       <div key={index} className="p-3 grid grid-cols-5 gap-4 items-center text-sm">
                         <span className="col-span-2 font-medium">{item.name}</span>
                         <span>{item.qty}</span>
-                        <span>{item.price} ر.س</span>
+                        <span>{item.price} د.ل</span>
                         <div className="flex items-center justify-between">
-                          <span className="font-semibold">{item.qty * item.price} ر.س</span>
+                          <span className="font-semibold">{item.qty * item.price} د.ل</span>
                           <Button
                             variant="ghost"
                             size="icon"
@@ -317,7 +317,7 @@ const Invoices = () => {
                     <div className="p-3 bg-muted/20 space-y-2">
                       <div className="flex justify-between text-sm">
                         <span>المجموع الفرعي</span>
-                        <span>{calculateSubtotal().toLocaleString()} ر.س</span>
+                        <span>{calculateSubtotal().toLocaleString()} د.ل</span>
                       </div>
                       <div className="flex justify-between text-sm items-center">
                         <span>الخصم</span>
@@ -332,12 +332,12 @@ const Invoices = () => {
                         />
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span>ضريبة القيمة المضافة (15%)</span>
-                        <span>{calculateTax().toLocaleString()} ر.س</span>
+                        <span>الضريبة</span>
+                        <span>{calculateTax().toLocaleString()} د.ل</span>
                       </div>
                       <div className="flex justify-between font-bold text-lg pt-2 border-t">
                         <span>الإجمالي</span>
-                        <span className="text-primary">{calculateTotal().toLocaleString()} ر.س</span>
+                        <span className="text-primary">{calculateTotal().toLocaleString()} د.ل</span>
                       </div>
                     </div>
                   </div>
@@ -393,7 +393,7 @@ const Invoices = () => {
                     {new Date(invoice.created_at).toLocaleDateString("ar-SA")}
                   </TableCell>
                   <TableCell>{invoice.items?.length || 0} أصناف</TableCell>
-                  <TableCell className="font-bold">{invoice.total.toLocaleString()} ر.س</TableCell>
+                  <TableCell className="font-bold">{invoice.total.toLocaleString()} د.ل</TableCell>
                   <TableCell>
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium ${

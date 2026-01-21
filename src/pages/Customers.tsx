@@ -110,11 +110,11 @@ const Customers = () => {
         <div className="stat-card">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl gradient-warning flex items-center justify-center">
-              <span className="text-xl font-bold text-primary-foreground">ر.س</span>
+              <span className="text-xl font-bold text-primary-foreground">د.ل</span>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">إجمالي المستحقات</p>
-              <p className="text-2xl font-bold">{totalBalance.toLocaleString()} ر.س</p>
+              <p className="text-2xl font-bold">{totalBalance.toLocaleString()} د.ل</p>
             </div>
           </div>
         </div>
@@ -275,7 +275,7 @@ const Customers = () => {
                         customer.balance > 0 ? "text-warning" : "text-success"
                       }`}
                     >
-                      {customer.balance.toLocaleString()} ر.س
+                      {customer.balance.toLocaleString()} د.ل
                     </span>
                   </TableCell>
                   <TableCell>

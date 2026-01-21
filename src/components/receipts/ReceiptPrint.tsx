@@ -22,7 +22,7 @@ const ReceiptPrint = ({ receipt }: ReceiptPrintProps) => {
     const thousands = ["", "ألف", "ألفان", "ثلاثة آلاف", "أربعة آلاف", "خمسة آلاف", "ستة آلاف", "سبعة آلاف", "ثمانية آلاف", "تسعة آلاف"];
     
     if (num === 0) return "صفر";
-    if (num >= 10000) return `${num.toLocaleString()} ريال سعودي`;
+    if (num >= 10000) return `${num.toLocaleString()} دينار ليبي`;
     
     const th = Math.floor(num / 1000);
     const h = Math.floor((num % 1000) / 100);
@@ -35,7 +35,7 @@ const ReceiptPrint = ({ receipt }: ReceiptPrintProps) => {
     if (t > 0) result += tens[t] + " و";
     if (o > 0) result += ones[o];
     
-    return result.replace(/ و$/, "") + " ريال سعودي فقط لا غير";
+    return result.replace(/ و$/, "") + " دينار ليبي فقط لا غير";
   };
 
   return (
@@ -78,7 +78,7 @@ const ReceiptPrint = ({ receipt }: ReceiptPrintProps) => {
         <div className="mb-6">
           <p className="text-sm text-gray-600 mb-1">المبلغ رقماً</p>
           <p className="text-3xl font-bold text-green-600 bg-green-50 p-4 rounded-lg text-center">
-            {receipt.amount.toLocaleString()} ريال سعودي
+            {receipt.amount.toLocaleString()} دينار ليبي
           </p>
         </div>
 
@@ -124,8 +124,7 @@ const ReceiptPrint = ({ receipt }: ReceiptPrintProps) => {
 
       {/* Footer */}
       <div className="mt-8 pt-6 border-t-2 border-gray-300 text-center text-sm text-gray-500">
-        <p>الرياض، حي النخيل، شارع العليا | هاتف: 0501234567 | البريد: info@almoraqib.com</p>
-        <p className="mt-1">الرقم الضريبي: 300123456789012</p>
+        <p>ليبيا، طرابلس | هاتف: 0912345678 | البريد: info@almoraqib.ly</p>
       </div>
     </div>
   );
