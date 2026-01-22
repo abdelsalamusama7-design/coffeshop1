@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Search, Edit, Trash2, Package, BarChart3, AlertTriangle, Download, Loader2 } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Package, BarChart3, AlertTriangle, Download, Loader2, Upload, ScanLine } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useProducts, Product, ProductInput } from "@/hooks/useProducts";
+import BarcodeScanner from "@/components/scanner/BarcodeScanner";
+import { toast } from "sonner";
 
 const categories = ["كاميرات", "أجهزة تسجيل", "كابلات", "ملحقات", "تخزين", "عام"];
 
@@ -37,6 +39,9 @@ const Inventory = () => {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [showScanner, setShowScanner] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [newProduct, setNewProduct] = useState({
     name: "",
     sku: "",
@@ -126,6 +131,87 @@ const Inventory = () => {
     link.click();
   };
 
+  const handleBarcodeScan = (code: string) => {
+    const product = products.find(
+      (p) => p.sku === code || p.name === code || p.id === code
+    );
+    
+    if (product) {
+      handleEditProduct(product);
+      toast.success(`تم العثور على: ${product.name}`);
+    } else {
+      // Open add dialog with SKU pre-filled
+      setNewProduct({
+        name: "",
+        sku: code,
+        price: "",
+        cost: "",
+        stock: "",
+        min_stock: "",
+        category: "",
+      });
+      setIsDialogOpen(true);
+      toast.info("منتج جديد - أكمل البيانات");
+    }
+    setShowScanner(false);
+  };
+
+  const handleImportExcel = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    
+    try {
+      const text = await file.text();
+      const lines = text.split("\n").filter(line => line.trim());
+      
+      // Skip header row
+      const dataLines = lines.slice(1);
+      let imported = 0;
+      let failed = 0;
+
+      for (const line of dataLines) {
+        const columns = line.split(",").map(col => col.trim().replace(/^"|"$/g, ''));
+        
+        // Expected format: SKU, Name, Category, Price, Cost, Stock, Min Stock
+        if (columns.length >= 2 && columns[1]) {
+          const productData: ProductInput = {
+            sku: columns[0] || undefined,
+            name: columns[1],
+            category: columns[2] || "عام",
+            price: Number(columns[3]) || 0,
+            cost: Number(columns[4]) || 0,
+            stock: Number(columns[5]) || 0,
+            min_stock: Number(columns[6]) || 5,
+          };
+
+          const result = await addProduct(productData);
+          if (result) {
+            imported++;
+          } else {
+            failed++;
+          }
+        }
+      }
+
+      if (imported > 0) {
+        toast.success(`تم استيراد ${imported} منتج بنجاح`);
+      }
+      if (failed > 0) {
+        toast.error(`فشل استيراد ${failed} منتج`);
+      }
+    } catch (error) {
+      console.error("Import error:", error);
+      toast.error("خطأ في قراءة الملف");
+    } finally {
+      setIsImporting(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
   if (loading) {
     return (
       <MainLayout title="إدارة المخزون" subtitle="عرض وإدارة جميع الأصناف والجرد">
@@ -188,20 +274,52 @@ const Inventory = () => {
               </Select>
             </div>
 
-            <Dialog open={isDialogOpen} onOpenChange={(open) => {
-              setIsDialogOpen(open);
-              if (!open) {
-                setEditingProduct(null);
-                setNewProduct({ name: "", sku: "", price: "", cost: "", stock: "", min_stock: "", category: "" });
-              }
-            }}>
-              <DialogTrigger asChild>
-                <Button className="gradient-primary border-0">
-                  <Plus className="w-4 h-4 ml-2" />
-                  إضافة صنف جديد
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-lg">
+            <div className="flex items-center gap-2">
+              {/* Import from Excel */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv,.xlsx,.xls"
+                onChange={handleImportExcel}
+                className="hidden"
+              />
+              <Button 
+                variant="outline" 
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isImporting}
+              >
+                {isImporting ? (
+                  <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                ) : (
+                  <Upload className="w-4 h-4 ml-2" />
+                )}
+                استيراد Excel
+              </Button>
+
+              {/* Barcode Scanner */}
+              <Button 
+                variant="outline" 
+                onClick={() => setShowScanner(true)}
+              >
+                <ScanLine className="w-4 h-4 ml-2" />
+                مسح باركود
+              </Button>
+
+              {/* Add Product Dialog */}
+              <Dialog open={isDialogOpen} onOpenChange={(open) => {
+                setIsDialogOpen(open);
+                if (!open) {
+                  setEditingProduct(null);
+                  setNewProduct({ name: "", sku: "", price: "", cost: "", stock: "", min_stock: "", category: "" });
+                }
+              }}>
+                <DialogTrigger asChild>
+                  <Button className="gradient-primary border-0">
+                    <Plus className="w-4 h-4 ml-2" />
+                    إضافة صنف جديد
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
                   <DialogTitle>{editingProduct ? "تعديل الصنف" : "إضافة صنف جديد"}</DialogTitle>
                 </DialogHeader>
@@ -286,8 +404,9 @@ const Inventory = () => {
                     {editingProduct ? "حفظ التعديلات" : "إضافة الصنف"}
                   </Button>
                 </div>
-              </DialogContent>
-            </Dialog>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
 
           {/* Products Table */}
@@ -514,6 +633,14 @@ const Inventory = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Barcode Scanner Modal */}
+      {showScanner && (
+        <BarcodeScanner
+          onScan={handleBarcodeScan}
+          onClose={() => setShowScanner(false)}
+        />
+      )}
     </MainLayout>
   );
 };
