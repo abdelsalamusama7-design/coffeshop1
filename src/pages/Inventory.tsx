@@ -131,6 +131,24 @@ const Inventory = () => {
     link.click();
   };
 
+  const handleDownloadTemplate = () => {
+    const templateContent = [
+      ["SKU", "Name", "Category", "Price", "Cost", "Stock", "MinStock"],
+      ["CAM-001", "كاميرا مراقبة 2MP", "كاميرات", "150", "100", "25", "5"],
+      ["DVR-001", "جهاز تسجيل 8 قنوات", "أجهزة تسجيل", "450", "300", "10", "2"],
+      ["CBL-001", "كابل شبكة 100 متر", "كابلات", "50", "30", "100", "20"],
+    ]
+      .map((row) => row.join(","))
+      .join("\n");
+
+    const blob = new Blob(["\ufeff" + templateContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "نموذج_استيراد_المنتجات.csv";
+    link.click();
+    toast.success("تم تحميل النموذج بنجاح");
+  };
+
   const handleBarcodeScan = (code: string) => {
     const product = products.find(
       (p) => p.sku === code || p.name === code || p.id === code
@@ -283,6 +301,13 @@ const Inventory = () => {
                 onChange={handleImportExcel}
                 className="hidden"
               />
+              <Button 
+                variant="outline" 
+                onClick={handleDownloadTemplate}
+              >
+                <Download className="w-4 h-4 ml-2" />
+                تحميل النموذج
+              </Button>
               <Button 
                 variant="outline" 
                 onClick={() => fileInputRef.current?.click()}
