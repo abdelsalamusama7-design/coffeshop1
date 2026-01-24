@@ -8,26 +8,30 @@ import {
   Settings,
   Receipt,
   LogOut,
+  Shield,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 const navItems = [
-  { icon: LayoutDashboard, label: "لوحة التحكم", path: "/" },
-  { icon: Package, label: "المخزون", path: "/inventory" },
-  { icon: FileText, label: "الفواتير", path: "/invoices" },
-  { icon: Receipt, label: "إيصالات القبض", path: "/receipts" },
-  { icon: Users, label: "العملاء", path: "/customers" },
-  { icon: BarChart3, label: "التقارير", path: "/reports" },
-  { icon: Settings, label: "الإعدادات", path: "/settings" },
+  { icon: LayoutDashboard, label: "لوحة التحكم", path: "/", adminOnly: false },
+  { icon: Package, label: "المخزون", path: "/inventory", adminOnly: false },
+  { icon: FileText, label: "الفواتير", path: "/invoices", adminOnly: false },
+  { icon: Receipt, label: "إيصالات القبض", path: "/receipts", adminOnly: false },
+  { icon: Users, label: "العملاء", path: "/customers", adminOnly: false },
+  { icon: BarChart3, label: "التقارير", path: "/reports", adminOnly: true },
+  { icon: Settings, label: "الإعدادات", path: "/settings", adminOnly: true },
 ];
 
 const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
+  const { isAdmin, loading: roleLoading } = useUserRole();
   const { toast } = useToast();
 
   const handleSignOut = async () => {
@@ -38,6 +42,10 @@ const Sidebar = () => {
     });
     navigate("/auth");
   };
+
+  const filteredNavItems = navItems.filter(
+    (item) => !item.adminOnly || isAdmin
+  );
 
   return (
     <aside className="fixed right-0 top-0 h-screen w-64 gradient-sidebar border-l border-sidebar-border flex flex-col z-50">
@@ -53,8 +61,8 @@ const Sidebar = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1">
-        {navItems.map((item) => {
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        {filteredNavItems.map((item) => {
           const isActive = location.pathname === item.path;
           return (
             <Link
@@ -64,6 +72,9 @@ const Sidebar = () => {
             >
               <item.icon className="w-5 h-5" />
               <span>{item.label}</span>
+              {item.adminOnly && (
+                <Shield className="w-3 h-3 mr-auto text-sidebar-primary" />
+              )}
             </Link>
           );
         })}
@@ -72,8 +83,18 @@ const Sidebar = () => {
       {/* User & Logout */}
       <div className="p-4 border-t border-sidebar-border space-y-3">
         {user && (
-          <div className="text-sm text-sidebar-foreground/80 text-center truncate px-2">
-            {user.email}
+          <div className="flex flex-col items-center gap-2">
+            <div className="text-sm text-sidebar-foreground/80 text-center truncate w-full px-2">
+              {user.email}
+            </div>
+            {!roleLoading && (
+              <Badge 
+                variant={isAdmin ? "default" : "secondary"}
+                className={isAdmin ? "bg-sidebar-primary text-sidebar-primary-foreground" : ""}
+              >
+                {isAdmin ? "مسؤول" : "مستخدم"}
+              </Badge>
+            )}
           </div>
         )}
         <Button
