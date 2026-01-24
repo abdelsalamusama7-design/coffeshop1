@@ -163,7 +163,7 @@ const Receipts = () => {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">إجمالي المقبوضات</p>
-              <p className="text-2xl font-bold">{totalReceived.toLocaleString()} ر.س</p>
+              <p className="text-2xl font-bold">{totalReceived.toLocaleString()} د.ل</p>
             </div>
           </div>
         </div>
@@ -181,12 +181,12 @@ const Receipts = () => {
         <div className="stat-card">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl gradient-warning flex items-center justify-center">
-              <span className="text-lg font-bold text-primary-foreground">ر.س</span>
+              <span className="text-lg font-bold text-primary-foreground">د.ل</span>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">إجمالي المستحقات</p>
               <p className="text-2xl font-bold">
-                {customers.reduce((sum, c) => sum + c.balance, 0).toLocaleString()} ر.س
+                {customers.reduce((sum, c) => sum + c.balance, 0).toLocaleString()} د.ل
               </p>
             </div>
           </div>
@@ -230,7 +230,7 @@ const Receipts = () => {
                           <span>{customer.name}</span>
                           {customer.balance > 0 && (
                             <span className="text-xs text-warning mr-2">
-                              (مستحق: {customer.balance.toLocaleString()} ر.س)
+                              (مستحق: {customer.balance.toLocaleString()} د.ل)
                             </span>
                           )}
                         </div>
@@ -249,7 +249,7 @@ const Receipts = () => {
                   <SelectContent>
                     {invoices.filter(i => i.status !== "paid").map((invoice) => (
                       <SelectItem key={invoice.id} value={invoice.id}>
-                        {invoice.invoice_number} - {invoice.customer_name} ({invoice.total.toLocaleString()} ر.س)
+                        {invoice.invoice_number} - {invoice.customer_name} ({invoice.total.toLocaleString()} د.ل)
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -258,7 +258,7 @@ const Receipts = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>المبلغ (ر.س)</Label>
+                  <Label>المبلغ (د.ل)</Label>
                   <Input
                     type="number"
                     value={newReceipt.amount}
@@ -351,7 +351,7 @@ const Receipts = () => {
                     {new Date(receipt.created_at).toLocaleDateString("ar-SA")}
                   </TableCell>
                   <TableCell className="font-bold text-success">
-                    +{receipt.amount.toLocaleString()} ر.س
+                    +{receipt.amount.toLocaleString()} د.ل
                   </TableCell>
                   <TableCell>
                     <span className="px-3 py-1 rounded-full bg-secondary text-secondary-foreground text-xs font-medium">
