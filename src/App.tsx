@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Inventory from "./pages/Inventory";
 import Invoices from "./pages/Invoices";
@@ -10,29 +12,82 @@ import Receipts from "./pages/Receipts";
 import Customers from "./pages/Customers";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/invoices" element={<Invoices />} />
-          <Route path="/receipts" element={<Receipts />} />
-          <Route path="/customers" element={<Customers />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/settings" element={<Settings />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/auth" element={<Auth />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Index />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/inventory"
+              element={
+                <ProtectedRoute>
+                  <Inventory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/invoices"
+              element={
+                <ProtectedRoute>
+                  <Invoices />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/receipts"
+              element={
+                <ProtectedRoute>
+                  <Receipts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/customers"
+              element={
+                <ProtectedRoute>
+                  <Customers />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/reports"
+              element={
+                <ProtectedRoute>
+                  <Reports />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              }
+            />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
