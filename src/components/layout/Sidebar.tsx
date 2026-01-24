@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Package,
@@ -7,8 +7,12 @@ import {
   BarChart3,
   Settings,
   Receipt,
+  LogOut,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const navItems = [
   { icon: LayoutDashboard, label: "لوحة التحكم", path: "/" },
@@ -22,6 +26,18 @@ const navItems = [
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut, user } = useAuth();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "تم تسجيل الخروج",
+      description: "إلى اللقاء!",
+    });
+    navigate("/auth");
+  };
 
   return (
     <aside className="fixed right-0 top-0 h-screen w-64 gradient-sidebar border-l border-sidebar-border flex flex-col z-50">
@@ -53,8 +69,21 @@ const Sidebar = () => {
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-sidebar-border">
+      {/* User & Logout */}
+      <div className="p-4 border-t border-sidebar-border space-y-3">
+        {user && (
+          <div className="text-sm text-sidebar-foreground/80 text-center truncate px-2">
+            {user.email}
+          </div>
+        )}
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-3 text-sidebar-foreground/80 hover:text-destructive hover:bg-destructive/10"
+          onClick={handleSignOut}
+        >
+          <LogOut className="w-5 h-5" />
+          <span>تسجيل الخروج</span>
+        </Button>
         <div className="text-xs text-sidebar-foreground/50 text-center">
           الإصدار 1.0.0
         </div>
