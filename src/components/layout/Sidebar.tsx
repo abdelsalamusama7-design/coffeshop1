@@ -24,6 +24,7 @@ const navItems = [
   { icon: Receipt, label: "إيصالات القبض", path: "/receipts", adminOnly: false },
   { icon: Users, label: "العملاء", path: "/customers", adminOnly: false },
   { icon: BarChart3, label: "التقارير", path: "/reports", adminOnly: true },
+  { icon: Users, label: "المستخدمين", path: "/users", adminOnly: true },
   { icon: Settings, label: "الإعدادات", path: "/settings", adminOnly: true },
 ];
 
