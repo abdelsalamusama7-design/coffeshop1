@@ -30,7 +30,7 @@ const navItems = [
   { icon: Users, label: "العملاء", path: "/customers" },
   { icon: BarChart3, label: "التقارير", path: "/reports" },
   { icon: Users, label: "المستخدمين", path: "/users" },
-  { icon: Settings, label: "الإعدادات", path: "/settings" },
+  { icon: Settings, label: "إعدادات المنظومة", path: "/settings" },
 ];
 
 const roleIcons: Record<string, React.ReactNode> = {
