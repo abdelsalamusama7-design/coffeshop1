@@ -1,5 +1,5 @@
 // Role-based permissions configuration
-export type AppRole = "admin" | "user" | "sales" | "technical" | "supervisor" | "maintenance" | "worker";
+export type AppRole = "admin" | "user" | "sales" | "technical" | "supervisor" | "maintenance" | "worker" | "sales_manager" | "accountant" | "financial_manager";
 
 // Define which roles can access which pages
 export const rolePermissions: Record<AppRole, string[]> = {
@@ -24,6 +24,33 @@ export const rolePermissions: Record<AppRole, string[]> = {
     "/receipts",
     "/customers",
     "/devices",
+    "/reports",
+    "/profile",
+  ],
+  sales_manager: [
+    "/",
+    "/inventory",
+    "/invoices",
+    "/quotations",
+    "/receipts",
+    "/customers",
+    "/reports",
+    "/profile",
+  ],
+  financial_manager: [
+    "/",
+    "/invoices",
+    "/quotations",
+    "/receipts",
+    "/customers",
+    "/reports",
+    "/profile",
+  ],
+  accountant: [
+    "/",
+    "/invoices",
+    "/receipts",
+    "/customers",
     "/reports",
     "/profile",
   ],
@@ -61,6 +88,9 @@ export const rolePermissions: Record<AppRole, string[]> = {
 export const roleInfo: Record<AppRole, { label: string; color: string }> = {
   admin: { label: "مسؤول", color: "bg-primary" },
   supervisor: { label: "مشرف", color: "bg-orange-500" },
+  sales_manager: { label: "مدير المبيعات", color: "bg-emerald-500" },
+  financial_manager: { label: "المدير المالي", color: "bg-indigo-500" },
+  accountant: { label: "المحاسب", color: "bg-cyan-500" },
   sales: { label: "مبيعات", color: "bg-blue-500" },
   technical: { label: "تقني", color: "bg-purple-500" },
   maintenance: { label: "صيانة", color: "bg-yellow-500" },
