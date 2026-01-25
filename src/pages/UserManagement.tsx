@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Users, Shield, User, RefreshCw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import AddUserDialog from "@/components/users/AddUserDialog";
 
 interface UserWithRole {
   user_id: string;
@@ -121,11 +122,12 @@ const UserManagement = () => {
   return (
     <MainLayout title="إدارة المستخدمين" subtitle="إدارة صلاحيات المستخدمين في النظام">
       <div className="space-y-6">
-        <div className="flex items-center justify-end">
+        <div className="flex items-center justify-end gap-2">
           <Button variant="outline" onClick={fetchUsers} disabled={loading}>
             <RefreshCw className={`h-4 w-4 ml-2 ${loading ? "animate-spin" : ""}`} />
             تحديث
           </Button>
+          <AddUserDialog onUserAdded={fetchUsers} />
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
