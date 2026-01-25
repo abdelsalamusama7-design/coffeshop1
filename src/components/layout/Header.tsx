@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Bell, Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,12 +38,14 @@ const Header = ({ title, subtitle }: HeaderProps) => {
           </span>
         </Button>
 
-        {/* User */}
-        <Button variant="ghost" size="icon">
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-            <User className="w-4 h-4 text-primary-foreground" />
-          </div>
-        </Button>
+        {/* User - Navigate to Profile */}
+        <Link to="/profile">
+          <Button variant="ghost" size="icon">
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+              <User className="w-4 h-4 text-primary-foreground" />
+            </div>
+          </Button>
+        </Link>
       </div>
     </header>
   );
