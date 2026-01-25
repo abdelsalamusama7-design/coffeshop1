@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useBackupSchedule } from "./useBackupSchedule";
 
 interface BackupData {
   version: string;
@@ -14,6 +15,7 @@ interface BackupData {
 
 export const useBackup = () => {
   const { toast } = useToast();
+  const { logBackup, updateLastBackup } = useBackupSchedule();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
 
@@ -59,12 +61,24 @@ export const useBackup = () => {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
+      const recordsCount = {
+        products: products.data?.length || 0,
+        customers: customers.data?.length || 0,
+        invoices: invoices.data?.length || 0,
+        receipts: receipts.data?.length || 0,
+      };
+
+      // Log successful backup
+      await logBackup("success", "manual", recordsCount, blob.size);
+      await updateLastBackup();
+
       toast({
         title: "تم التصدير بنجاح",
-        description: `تم تصدير ${products.data?.length || 0} منتج، ${customers.data?.length || 0} عميل، ${invoices.data?.length || 0} فاتورة، ${receipts.data?.length || 0} إيصال`,
+        description: `تم تصدير ${recordsCount.products} منتج، ${recordsCount.customers} عميل، ${recordsCount.invoices} فاتورة، ${recordsCount.receipts} إيصال`,
       });
     } catch (error) {
       console.error("Export error:", error);
+      await logBackup("failed", "manual", undefined, undefined, error instanceof Error ? error.message : "Unknown error");
       toast({
         title: "خطأ في التصدير",
         description: "فشل في تصدير البيانات",
