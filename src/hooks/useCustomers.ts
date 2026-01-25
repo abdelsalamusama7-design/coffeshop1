@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { notifyCustomerAdded } from "@/lib/notificationService";
 
 export interface Customer {
   id: string;
@@ -24,6 +26,7 @@ export interface CustomerInput {
 }
 
 export const useCustomers = () => {
+  const { user } = useAuth();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -56,6 +59,12 @@ export const useCustomers = () => {
       if (error) throw error;
       setCustomers([data, ...customers]);
       toast.success("تم إضافة العميل بنجاح");
+      
+      // Send notification
+      if (user?.id) {
+        notifyCustomerAdded(user.id, customer.name);
+      }
+      
       return data;
     } catch (error: any) {
       toast.error("خطأ في إضافة العميل");

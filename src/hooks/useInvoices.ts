@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { notifyInvoiceCreated } from "@/lib/notificationService";
 
 export interface InvoiceItem {
   id: string;
@@ -47,6 +49,7 @@ export interface InvoiceInput {
 }
 
 export const useInvoices = () => {
+  const { user } = useAuth();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -136,6 +139,12 @@ export const useInvoices = () => {
       const newInvoice = { ...invoice, items: items || [] };
       setInvoices([newInvoice, ...invoices]);
       toast.success("تم إنشاء الفاتورة بنجاح");
+      
+      // Send notification
+      if (user?.id) {
+        notifyInvoiceCreated(user.id, invoice.invoice_number, input.customer_name, input.total);
+      }
+      
       return newInvoice;
     } catch (error: any) {
       toast.error("خطأ في إنشاء الفاتورة");
