@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +19,9 @@ import {
   CalendarIcon,
   ChevronRight,
   ChevronLeft,
+  Printer,
 } from "lucide-react";
+import DailyReportPrint from "./DailyReportPrint";
 
 interface ReportItem {
   label: string;
@@ -74,6 +76,7 @@ const ReportCard = ({
 );
 
 const DailyReport = () => {
+  const printRef = useRef<HTMLDivElement>(null);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   // Get selected date range
@@ -199,6 +202,49 @@ const DailyReport = () => {
     { label: "خسائر البيع", value: 0, color: "bg-red-600" },
   ];
 
+  const handlePrint = () => {
+    const printContent = printRef.current;
+    if (!printContent) return;
+
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ar">
+      <head>
+        <meta charset="UTF-8">
+        <title>التقرير اليومي - ${format(selectedDate, "yyyy-MM-dd")}</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: 'Cairo', sans-serif; direction: rtl; }
+          .print-content { padding: 20px; }
+          .bg-emerald-600 { background-color: #059669; }
+          .bg-blue-600 { background-color: #2563eb; }
+          .bg-amber-600 { background-color: #d97706; }
+          .bg-purple-600 { background-color: #9333ea; }
+          .text-emerald-600 { color: #059669; }
+          .text-blue-600 { color: #2563eb; }
+          .text-amber-600 { color: #d97706; }
+          @media print {
+            body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+          }
+        </style>
+      </head>
+      <body>
+        ${printContent.innerHTML}
+      </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
+  };
+
   if (isLoading) {
     return (
       <Card className="p-6">
@@ -277,6 +323,16 @@ const DailyReport = () => {
                 اليوم
               </Button>
             )}
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handlePrint}
+              className="h-8 gap-1"
+            >
+              <Printer className="h-4 w-4" />
+              طباعة
+            </Button>
           </div>
         </div>
       </CardHeader>
@@ -330,6 +386,25 @@ const DailyReport = () => {
           </div>
         </div>
       </CardContent>
+
+      {/* Hidden Print Component */}
+      <div className="hidden">
+        <div ref={printRef}>
+          <DailyReportPrint
+            date={format(selectedDate, "EEEE، d MMMM yyyy", { locale: ar })}
+            totalsItems={totalsItems.map(({ label, value }) => ({ label, value }))}
+            invoicesItems={invoicesItems.map(({ label, value }) => ({ label, value }))}
+            receiptsItems={receiptsItems.map(({ label, value }) => ({ label, value }))}
+            otherItems={otherItems.map(({ label, value }) => ({ label, value }))}
+            summary={{
+              invoicesCount: invoices?.length || 0,
+              receiptsCount: receipts?.length || 0,
+              totalSales,
+              totalReceipts,
+            }}
+          />
+        </div>
+      </div>
     </Card>
   );
 };
