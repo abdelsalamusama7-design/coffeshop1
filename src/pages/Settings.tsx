@@ -11,10 +11,10 @@ import {
   Building2,
   Printer,
   Bell,
-  Database,
   Loader2,
 } from "lucide-react";
 import { useCompanySettings } from "@/hooks/useCompanySettings";
+import BackupSection from "@/components/settings/BackupSection";
 
 const Settings = () => {
   const { settings, isLoading, updateSettings, isUpdating } = useCompanySettings();
@@ -294,28 +294,8 @@ const Settings = () => {
           </Button>
         </Card>
 
-        {/* Backup */}
-        <Card className="p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg gradient-danger flex items-center justify-center">
-              <Database className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-foreground">النسخ الاحتياطي</h3>
-              <p className="text-sm text-muted-foreground">إدارة النسخ الاحتياطية للبيانات</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button variant="outline">
-              <Database className="w-4 h-4 ml-2" />
-              إنشاء نسخة احتياطية
-            </Button>
-            <Button variant="outline">استعادة نسخة احتياطية</Button>
-          </div>
-          <p className="text-sm text-muted-foreground mt-4">
-            آخر نسخة احتياطية: ١٥ يناير ٢٠٢٤ - ١٠:٣٠ ص
-          </p>
-        </Card>
+        {/* Backup Section */}
+        <BackupSection />
       </div>
     </MainLayout>
   );
