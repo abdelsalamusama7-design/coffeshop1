@@ -27,8 +27,8 @@ import { Badge } from "@/components/ui/badge";
 const navItems = [
   { icon: LayoutDashboard, label: "لوحة التحكم", path: "/" },
   { icon: Package, label: "المخزون", path: "/inventory" },
+  { icon: FileSpreadsheet, label: "عروض الأسعار", path: "/quotations", indent: true },
   { icon: FileText, label: "الفواتير", path: "/invoices" },
-  { icon: FileSpreadsheet, label: "عروض الأسعار", path: "/quotations" },
   { icon: Receipt, label: "إيصالات القبض", path: "/receipts" },
   { icon: Users, label: "العملاء", path: "/customers" },
   { icon: Cpu, label: "الأجهزة والضمانات", path: "/devices" },
@@ -88,7 +88,7 @@ const Sidebar = () => {
             <Link
               key={item.path}
               to={item.path}
-              className={`nav-link ${isActive ? "nav-link-active" : ""}`}
+              className={`nav-link ${isActive ? "nav-link-active" : ""} ${(item as any).indent ? "mr-4" : ""}`}
             >
               <item.icon className="w-5 h-5" />
               <span>{item.label}</span>
