@@ -22,6 +22,7 @@ import Profile from "./pages/Profile";
 import Quotations from "./pages/Quotations";
 import Devices from "./pages/Devices";
 import NotFound from "./pages/NotFound";
+import AIChatbot from "./components/chat/AIChatbot";
 
 const queryClient = new QueryClient();
 
@@ -128,6 +129,7 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
             </Routes>
+            <AIChatbot />
           </BrowserRouter>
         </TooltipProvider>
       </NotificationProvider>
