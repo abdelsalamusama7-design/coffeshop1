@@ -27,8 +27,8 @@ import { Badge } from "@/components/ui/badge";
 const navItems = [
   { icon: LayoutDashboard, label: "لوحة التحكم", path: "/" },
   { icon: Package, label: "المخزون", path: "/inventory" },
-  { icon: FileSpreadsheet, label: "عروض الأسعار", path: "/quotations" },
   { icon: FileText, label: "الفواتير", path: "/invoices" },
+  { icon: FileSpreadsheet, label: "عروض الأسعار", path: "/quotations" },
   { icon: Receipt, label: "إيصالات القبض", path: "/receipts" },
   { icon: Users, label: "العملاء", path: "/customers" },
   { icon: Cpu, label: "الأجهزة والضمانات", path: "/devices" },
