@@ -84,7 +84,10 @@ const Sidebar = () => {
       {/* User & Logout */}
       <div className="p-4 border-t border-sidebar-border space-y-3">
         {user && (
-          <div className="flex flex-col items-center gap-2">
+          <a 
+            href="/profile" 
+            className="flex flex-col items-center gap-2 p-2 rounded-lg hover:bg-sidebar-accent transition-colors cursor-pointer"
+          >
             <div className="text-sm text-sidebar-foreground/80 text-center truncate w-full px-2">
               {user.email}
             </div>
@@ -96,7 +99,7 @@ const Sidebar = () => {
                 {isAdmin ? "مسؤول" : "مستخدم"}
               </Badge>
             )}
-          </div>
+          </a>
         )}
         <Button
           variant="ghost"
