@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-
-type AppRole = "admin" | "user";
+import { AppRole, canAccessPath, getAllowedPaths, roleInfo } from "@/lib/permissions";
 
 interface UserRole {
   role: AppRole;
   loading: boolean;
   isAdmin: boolean;
+  canAccess: (path: string) => boolean;
+  allowedPaths: string[];
+  roleLabel: string;
+  roleColor: string;
 }
 
 export const useUserRole = (): UserRole => {
@@ -44,9 +47,15 @@ export const useUserRole = (): UserRole => {
     fetchRole();
   }, [user]);
 
+  const info = roleInfo[role] || roleInfo.user;
+
   return {
     role,
     loading,
     isAdmin: role === "admin",
+    canAccess: (path: string) => canAccessPath(role, path),
+    allowedPaths: getAllowedPaths(role),
+    roleLabel: info.label,
+    roleColor: info.color,
   };
 };

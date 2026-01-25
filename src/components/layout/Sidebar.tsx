@@ -9,6 +9,11 @@ import {
   Receipt,
   LogOut,
   Shield,
+  ShoppingCart,
+  Wrench,
+  Eye,
+  HardHat,
+  User,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,21 +23,31 @@ import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
 const navItems = [
-  { icon: LayoutDashboard, label: "لوحة التحكم", path: "/", adminOnly: false },
-  { icon: Package, label: "المخزون", path: "/inventory", adminOnly: false },
-  { icon: FileText, label: "الفواتير", path: "/invoices", adminOnly: false },
-  { icon: Receipt, label: "إيصالات القبض", path: "/receipts", adminOnly: false },
-  { icon: Users, label: "العملاء", path: "/customers", adminOnly: false },
-  { icon: BarChart3, label: "التقارير", path: "/reports", adminOnly: true },
-  { icon: Users, label: "المستخدمين", path: "/users", adminOnly: true },
-  { icon: Settings, label: "الإعدادات", path: "/settings", adminOnly: true },
+  { icon: LayoutDashboard, label: "لوحة التحكم", path: "/" },
+  { icon: Package, label: "المخزون", path: "/inventory" },
+  { icon: FileText, label: "الفواتير", path: "/invoices" },
+  { icon: Receipt, label: "إيصالات القبض", path: "/receipts" },
+  { icon: Users, label: "العملاء", path: "/customers" },
+  { icon: BarChart3, label: "التقارير", path: "/reports" },
+  { icon: Users, label: "المستخدمين", path: "/users" },
+  { icon: Settings, label: "الإعدادات", path: "/settings" },
 ];
+
+const roleIcons: Record<string, React.ReactNode> = {
+  admin: <Shield className="h-3 w-3" />,
+  supervisor: <Eye className="h-3 w-3" />,
+  sales: <ShoppingCart className="h-3 w-3" />,
+  technical: <Wrench className="h-3 w-3" />,
+  maintenance: <HardHat className="h-3 w-3" />,
+  worker: <User className="h-3 w-3" />,
+  user: <User className="h-3 w-3" />,
+};
 
 const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
-  const { isAdmin, loading: roleLoading } = useUserRole();
+  const { role, loading: roleLoading, canAccess, roleLabel, roleColor, isAdmin } = useUserRole();
   const { toast } = useToast();
 
   const handleSignOut = async () => {
@@ -44,9 +59,8 @@ const Sidebar = () => {
     navigate("/auth");
   };
 
-  const filteredNavItems = navItems.filter(
-    (item) => !item.adminOnly || isAdmin
-  );
+  // Filter nav items based on user permissions
+  const filteredNavItems = navItems.filter((item) => canAccess(item.path));
 
   return (
     <aside className="fixed right-0 top-0 h-screen w-64 gradient-sidebar border-l border-sidebar-border flex flex-col z-50">
@@ -65,6 +79,7 @@ const Sidebar = () => {
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {filteredNavItems.map((item) => {
           const isActive = location.pathname === item.path;
+          const isAdminPage = ["/reports", "/users", "/settings"].includes(item.path);
           return (
             <Link
               key={item.path}
@@ -73,7 +88,7 @@ const Sidebar = () => {
             >
               <item.icon className="w-5 h-5" />
               <span>{item.label}</span>
-              {item.adminOnly && (
+              {isAdminPage && isAdmin && (
                 <Shield className="w-3 h-3 mr-auto text-sidebar-primary" />
               )}
             </Link>
@@ -93,10 +108,10 @@ const Sidebar = () => {
             </div>
             {!roleLoading && (
               <Badge 
-                variant={isAdmin ? "default" : "secondary"}
-                className={isAdmin ? "bg-sidebar-primary text-sidebar-primary-foreground" : ""}
+                className={`${roleColor} text-white flex items-center gap-1`}
               >
-                {isAdmin ? "مسؤول" : "مستخدم"}
+                {roleIcons[role]}
+                {roleLabel}
               </Badge>
             )}
           </a>
