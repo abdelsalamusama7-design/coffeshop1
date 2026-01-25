@@ -7,13 +7,26 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Users, Shield, User, RefreshCw } from "lucide-react";
+import { Loader2, Users, Shield, User, RefreshCw, Pencil, Wrench, Eye, ShoppingCart, HardHat } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import AddUserDialog from "@/components/users/AddUserDialog";
+import EditUserDialog from "@/components/users/EditUserDialog";
+
+type AppRole = "admin" | "user" | "sales" | "technical" | "supervisor" | "maintenance" | "worker";
+
+const roleLabels: Record<AppRole, { label: string; icon: React.ReactNode; color: string }> = {
+  admin: { label: "مسؤول", icon: <Shield className="h-4 w-4" />, color: "bg-primary" },
+  user: { label: "مستخدم", icon: <User className="h-4 w-4" />, color: "bg-secondary" },
+  sales: { label: "مبيعات", icon: <ShoppingCart className="h-4 w-4" />, color: "bg-blue-500" },
+  technical: { label: "تقني", icon: <Wrench className="h-4 w-4" />, color: "bg-purple-500" },
+  supervisor: { label: "مشرف", icon: <Eye className="h-4 w-4" />, color: "bg-orange-500" },
+  maintenance: { label: "صيانة", icon: <HardHat className="h-4 w-4" />, color: "bg-yellow-500" },
+  worker: { label: "عامل", icon: <User className="h-4 w-4" />, color: "bg-gray-500" },
+};
 
 interface UserWithRole {
   user_id: string;
-  role: "admin" | "user";
+  role: AppRole;
   email: string;
   full_name: string | null;
   created_at: string;
@@ -23,6 +36,8 @@ const UserManagement = () => {
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [editingUser, setEditingUser] = useState<UserWithRole | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { user: currentUser } = useAuth();
   const { toast } = useToast();
 
@@ -48,8 +63,8 @@ const UserManagement = () => {
         const profile = profilesData?.find((p) => p.user_id === role.user_id);
         return {
           user_id: role.user_id,
-          role: role.role as "admin" | "user",
-          email: "", // We'll show user_id since we can't access auth.users
+          role: role.role as AppRole,
+          email: "",
           full_name: profile?.full_name || null,
           created_at: role.created_at,
         };
@@ -72,7 +87,7 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
-  const handleRoleChange = async (userId: string, newRole: "admin" | "user") => {
+  const handleRoleChange = async (userId: string, newRole: AppRole) => {
     if (userId === currentUser?.id) {
       toast({
         title: "غير مسموح",
@@ -95,9 +110,10 @@ const UserManagement = () => {
         prev.map((u) => (u.user_id === userId ? { ...u, role: newRole } : u))
       );
 
+      const roleLabel = roleLabels[newRole]?.label || newRole;
       toast({
         title: "تم التحديث",
-        description: `تم تغيير صلاحية المستخدم إلى ${newRole === "admin" ? "مسؤول" : "مستخدم"}`,
+        description: `تم تغيير صلاحية المستخدم إلى ${roleLabel}`,
       });
     } catch (error: any) {
       console.error("Error updating role:", error);
@@ -109,6 +125,11 @@ const UserManagement = () => {
     } finally {
       setUpdating(null);
     }
+  };
+
+  const handleEditUser = (user: UserWithRole) => {
+    setEditingUser(user);
+    setEditDialogOpen(true);
   };
 
   const formatDate = (dateString: string) => {
@@ -202,70 +223,88 @@ const UserManagement = () => {
                     <TableHead className="text-right">الاسم</TableHead>
                     <TableHead className="text-right">تاريخ الانضمام</TableHead>
                     <TableHead className="text-right">الصلاحية</TableHead>
+                    <TableHead className="text-right">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {users.map((user) => (
-                    <TableRow key={user.user_id} className="table-row-hover">
-                      <TableCell className="font-mono text-sm">
-                        {user.user_id === currentUser?.id ? (
-                          <span className="flex items-center gap-2">
-                            {user.user_id.slice(0, 8)}...
-                            <Badge variant="outline" className="text-xs">أنت</Badge>
-                          </span>
-                        ) : (
-                          `${user.user_id.slice(0, 8)}...`
-                        )}
-                      </TableCell>
-                      <TableCell>{user.full_name || "غير محدد"}</TableCell>
-                      <TableCell>{formatDate(user.created_at)}</TableCell>
-                      <TableCell>
-                        {user.user_id === currentUser?.id ? (
-                          <Badge
-                            variant={user.role === "admin" ? "default" : "secondary"}
-                            className={user.role === "admin" ? "bg-primary" : ""}
-                          >
-                            {user.role === "admin" ? "مسؤول" : "مستخدم"}
-                          </Badge>
-                        ) : (
-                          <Select
-                            value={user.role}
-                            onValueChange={(value: "admin" | "user") =>
-                              handleRoleChange(user.user_id, value)
-                            }
-                            disabled={updating === user.user_id}
-                          >
-                            <SelectTrigger className="w-32">
-                              {updating === user.user_id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <SelectValue />
-                              )}
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="admin">
-                                <span className="flex items-center gap-2">
-                                  <Shield className="h-4 w-4" />
-                                  مسؤول
-                                </span>
-                              </SelectItem>
-                              <SelectItem value="user">
-                                <span className="flex items-center gap-2">
-                                  <User className="h-4 w-4" />
-                                  مستخدم
-                                </span>
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {users.map((user) => {
+                    const roleInfo = roleLabels[user.role] || roleLabels.user;
+                    return (
+                      <TableRow key={user.user_id} className="table-row-hover">
+                        <TableCell className="font-mono text-sm">
+                          {user.user_id === currentUser?.id ? (
+                            <span className="flex items-center gap-2">
+                              {user.user_id.slice(0, 8)}...
+                              <Badge variant="outline" className="text-xs">أنت</Badge>
+                            </span>
+                          ) : (
+                            `${user.user_id.slice(0, 8)}...`
+                          )}
+                        </TableCell>
+                        <TableCell>{user.full_name || "غير محدد"}</TableCell>
+                        <TableCell>{formatDate(user.created_at)}</TableCell>
+                        <TableCell>
+                          {user.user_id === currentUser?.id ? (
+                            <Badge className={roleInfo.color}>
+                              <span className="flex items-center gap-1">
+                                {roleInfo.icon}
+                                {roleInfo.label}
+                              </span>
+                            </Badge>
+                          ) : (
+                            <Select
+                              value={user.role}
+                              onValueChange={(value: AppRole) =>
+                                handleRoleChange(user.user_id, value)
+                              }
+                              disabled={updating === user.user_id}
+                            >
+                              <SelectTrigger className="w-32">
+                                {updating === user.user_id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <SelectValue />
+                                )}
+                              </SelectTrigger>
+                              <SelectContent>
+                                {Object.entries(roleLabels).map(([key, { label, icon }]) => (
+                                  <SelectItem key={key} value={key}>
+                                    <span className="flex items-center gap-2">
+                                      {icon}
+                                      {label}
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {user.user_id !== currentUser?.id && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditUser(user)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             )}
           </CardContent>
         </Card>
+
+        <EditUserDialog
+          user={editingUser}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          onUserUpdated={fetchUsers}
+        />
       </div>
     </MainLayout>
   );
