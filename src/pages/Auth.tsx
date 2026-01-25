@@ -271,7 +271,7 @@ const Auth = () => {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-2">
             <button
               type="button"
               onClick={() => {
@@ -279,11 +279,19 @@ const Auth = () => {
                 setErrors({});
                 setFormData({ email: "", password: "", confirmPassword: "", fullName: "" });
               }}
-              className="text-sm text-primary hover:underline"
+              className="text-sm text-primary hover:underline block w-full"
               disabled={loading}
             >
               {isLogin ? "ليس لديك حساب؟ سجل الآن" : "لديك حساب؟ سجل دخولك"}
             </button>
+            {isLogin && (
+              <a
+                href="/forgot-password"
+                className="text-sm text-muted-foreground hover:text-primary hover:underline block"
+              >
+                نسيت كلمة المرور؟
+              </a>
+            )}
           </div>
         </CardContent>
       </Card>
