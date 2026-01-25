@@ -1,23 +1,29 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
-  Wallet,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { ar } from "date-fns/locale";
+import {
   TrendingUp,
-  TrendingDown,
   Receipt,
-  ShoppingCart,
-  RotateCcw,
-  Truck,
-  CreditCard,
-  Banknote,
+  CalendarIcon,
+  ChevronRight,
+  ChevronLeft,
 } from "lucide-react";
 
 interface ReportItem {
   label: string;
   value: number;
-  icon?: React.ElementType;
   color: string;
 }
 
@@ -68,20 +74,43 @@ const ReportCard = ({
 );
 
 const DailyReport = () => {
-  // Get today's date range
-  const today = new Date();
-  const startOfDay = new Date(today.setHours(0, 0, 0, 0)).toISOString();
-  const endOfDay = new Date(today.setHours(23, 59, 59, 999)).toISOString();
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+  // Get selected date range
+  const startOfDay = new Date(selectedDate);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(selectedDate);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const goToPreviousDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() - 1);
+    setSelectedDate(newDate);
+  };
+
+  const goToNextDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() + 1);
+    if (newDate <= new Date()) {
+      setSelectedDate(newDate);
+    }
+  };
+
+  const goToToday = () => {
+    setSelectedDate(new Date());
+  };
+
+  const isToday = selectedDate.toDateString() === new Date().toDateString();
 
   // Fetch today's invoices
   const { data: invoices, isLoading: invoicesLoading } = useQuery({
-    queryKey: ["daily-invoices", startOfDay],
+    queryKey: ["daily-invoices", startOfDay.toISOString()],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("invoices")
         .select("*")
-        .gte("created_at", startOfDay)
-        .lte("created_at", endOfDay);
+        .gte("created_at", startOfDay.toISOString())
+        .lte("created_at", endOfDay.toISOString());
       if (error) throw error;
       return data || [];
     },
@@ -89,13 +118,13 @@ const DailyReport = () => {
 
   // Fetch today's receipts
   const { data: receipts, isLoading: receiptsLoading } = useQuery({
-    queryKey: ["daily-receipts", startOfDay],
+    queryKey: ["daily-receipts", startOfDay.toISOString()],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("receipts")
         .select("*")
-        .gte("created_at", startOfDay)
-        .lte("created_at", endOfDay);
+        .gte("created_at", startOfDay.toISOString())
+        .lte("created_at", endOfDay.toISOString());
       if (error) throw error;
       return data || [];
     },
@@ -186,18 +215,70 @@ const DailyReport = () => {
   return (
     <Card className="shadow-card overflow-hidden">
       <CardHeader className="bg-primary text-primary-foreground">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Receipt className="w-5 h-5" />
-          التقارير اليومية
-          <span className="text-sm font-normal mr-auto">
-            {new Date().toLocaleDateString("ar-LY", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </span>
-        </CardTitle>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Receipt className="w-5 h-5" />
+            التقارير اليومية
+          </CardTitle>
+          
+          {/* Date Filter Controls */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={goToPreviousDay}
+              className="h-8 w-8"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="secondary"
+                  className={cn(
+                    "justify-start text-right font-normal h-8 px-3",
+                    !selectedDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="ml-2 h-4 w-4" />
+                  {format(selectedDate, "EEEE، d MMMM yyyy", { locale: ar })}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 z-50" align="end">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => date && setSelectedDate(date)}
+                  disabled={(date) => date > new Date()}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={goToNextDay}
+              disabled={isToday}
+              className="h-8 w-8"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+
+            {!isToday && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={goToToday}
+                className="h-8"
+              >
+                اليوم
+              </Button>
+            )}
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
