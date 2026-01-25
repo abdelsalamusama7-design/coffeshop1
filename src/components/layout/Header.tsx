@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import { Search, User } from "lucide-react";
+import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import NotificationCenter from "@/components/notifications/NotificationCenter";
+import GlobalSearch from "./GlobalSearch";
 
 interface HeaderProps {
   title: string;
@@ -22,14 +22,8 @@ const Header = ({ title, subtitle }: HeaderProps) => {
 
       {/* Actions */}
       <div className="flex items-center gap-4">
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="بحث..."
-            className="w-64 pr-10 bg-muted/50 border-0 focus-visible:ring-1"
-          />
-        </div>
+        {/* Global Search */}
+        <GlobalSearch />
 
         {/* Notifications */}
         <NotificationCenter />
