@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { notifyReceiptCreated } from "@/lib/notificationService";
 
 export interface Receipt {
   id: string;
@@ -26,6 +28,7 @@ export interface ReceiptInput {
 }
 
 export const useReceipts = () => {
+  const { user } = useAuth();
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -82,6 +85,12 @@ export const useReceipts = () => {
       if (error) throw error;
       setReceipts([data, ...receipts]);
       toast.success("تم إنشاء الإيصال بنجاح");
+      
+      // Send notification
+      if (user?.id) {
+        notifyReceiptCreated(user.id, data.receipt_number, input.customer_name, input.amount);
+      }
+      
       return data;
     } catch (error: any) {
       toast.error("خطأ في إنشاء الإيصال");

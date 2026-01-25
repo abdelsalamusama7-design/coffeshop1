@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { notifyProductAdded, notifyProductUpdated, notifyLowStock } from "@/lib/notificationService";
 
 export interface Product {
   id: string;
@@ -28,6 +30,7 @@ export interface ProductInput {
 }
 
 export const useProducts = () => {
+  const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -60,6 +63,17 @@ export const useProducts = () => {
       if (error) throw error;
       setProducts([data, ...products]);
       toast.success("تم إضافة الصنف بنجاح");
+      
+      // Send notification
+      if (user?.id) {
+        notifyProductAdded(user.id, product.name);
+        
+        // Check for low stock
+        if (product.stock <= product.min_stock) {
+          notifyLowStock(user.id, product.name, product.stock, product.min_stock);
+        }
+      }
+      
       return data;
     } catch (error: any) {
       toast.error("خطأ في إضافة الصنف");
@@ -80,6 +94,17 @@ export const useProducts = () => {
       if (error) throw error;
       setProducts(products.map((p) => (p.id === id ? data : p)));
       toast.success("تم تحديث الصنف بنجاح");
+      
+      // Send notification for update and check low stock
+      if (user?.id && product.name) {
+        notifyProductUpdated(user.id, product.name);
+        
+        // Check for low stock after update
+        if (data.stock <= data.min_stock) {
+          notifyLowStock(user.id, data.name, data.stock, data.min_stock);
+        }
+      }
+      
       return data;
     } catch (error: any) {
       toast.error("خطأ في تحديث الصنف");

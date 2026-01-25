@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { Bell, Search, User } from "lucide-react";
+import { Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import NotificationCenter from "@/components/notifications/NotificationCenter";
 
 interface HeaderProps {
   title: string;
@@ -31,12 +32,7 @@ const Header = ({ title, subtitle }: HeaderProps) => {
         </div>
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="w-5 h-5 text-muted-foreground" />
-          <span className="absolute -top-1 -left-1 w-4 h-4 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
-            3
-          </span>
-        </Button>
+        <NotificationCenter />
 
         {/* User - Navigate to Profile */}
         <Link to="/profile">
