@@ -4,6 +4,17 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { notifyCustomerAdded } from "@/lib/notificationService";
 
+export type CustomerStatus = 'جديد' | 'تم التواصل' | 'تم المعاينة' | 'تم الاتفاق' | 'تم التركيب' | 'مرفوض';
+
+export const CUSTOMER_STATUSES: { value: CustomerStatus; label: string; color: string }[] = [
+  { value: 'جديد', label: 'جديد', color: 'bg-blue-500' },
+  { value: 'تم التواصل', label: 'تم التواصل', color: 'bg-yellow-500' },
+  { value: 'تم المعاينة', label: 'تم المعاينة', color: 'bg-purple-500' },
+  { value: 'تم الاتفاق', label: 'تم الاتفاق', color: 'bg-orange-500' },
+  { value: 'تم التركيب', label: 'تم التركيب', color: 'bg-green-500' },
+  { value: 'مرفوض', label: 'مرفوض', color: 'bg-red-500' },
+];
+
 export interface Customer {
   id: string;
   name: string;
@@ -12,6 +23,7 @@ export interface Customer {
   address: string | null;
   balance: number;
   notes: string | null;
+  status: CustomerStatus;
   created_at: string;
   updated_at: string;
 }
@@ -23,6 +35,7 @@ export interface CustomerInput {
   address?: string;
   balance?: number;
   notes?: string;
+  status?: CustomerStatus;
 }
 
 export const useCustomers = () => {
@@ -39,7 +52,7 @@ export const useCustomers = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setCustomers(data || []);
+      setCustomers((data as Customer[]) || []);
     } catch (error: any) {
       toast.error("خطأ في تحميل العملاء");
       console.error("Error fetching customers:", error);
@@ -57,7 +70,7 @@ export const useCustomers = () => {
         .single();
 
       if (error) throw error;
-      setCustomers([data, ...customers]);
+      setCustomers([data as Customer, ...customers]);
       toast.success("تم إضافة العميل بنجاح");
       
       // Send notification
@@ -83,7 +96,7 @@ export const useCustomers = () => {
         .single();
 
       if (error) throw error;
-      setCustomers(customers.map((c) => (c.id === id ? data : c)));
+      setCustomers(customers.map((c) => (c.id === id ? (data as Customer) : c)));
       toast.success("تم تحديث العميل بنجاح");
       return data;
     } catch (error: any) {

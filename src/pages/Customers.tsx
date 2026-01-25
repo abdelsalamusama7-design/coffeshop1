@@ -14,17 +14,27 @@ import { Plus, Search, Edit, Trash2, Phone, Mail, User, Loader2 } from "lucide-r
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useCustomers, Customer, CustomerInput } from "@/hooks/useCustomers";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useCustomers, Customer, CustomerInput, CustomerStatus, CUSTOMER_STATUSES } from "@/hooks/useCustomers";
+import CustomerStatusBadge from "@/components/customers/CustomerStatusBadge";
 
 const Customers = () => {
   const { customers, loading, addCustomer, updateCustomer, deleteCustomer } = useCustomers();
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [newCustomer, setNewCustomer] = useState({
@@ -33,14 +43,19 @@ const Customers = () => {
     email: "",
     address: "",
     notes: "",
+    status: "جديد" as CustomerStatus,
   });
 
-  const filteredCustomers = customers.filter(
-    (customer) =>
+  const filteredCustomers = customers.filter((customer) => {
+    const matchesSearch =
       customer.name.includes(searchTerm) ||
       (customer.phone && customer.phone.includes(searchTerm)) ||
-      (customer.email && customer.email.includes(searchTerm))
-  );
+      (customer.email && customer.email.includes(searchTerm));
+    
+    const matchesStatus = statusFilter === "all" || customer.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  });
 
   const handleAddCustomer = async () => {
     if (newCustomer.name) {
@@ -50,6 +65,7 @@ const Customers = () => {
         email: newCustomer.email || undefined,
         address: newCustomer.address || undefined,
         notes: newCustomer.notes || undefined,
+        status: newCustomer.status,
       };
 
       if (editingCustomer) {
@@ -58,7 +74,7 @@ const Customers = () => {
         await addCustomer(customerData);
       }
 
-      setNewCustomer({ name: "", phone: "", email: "", address: "", notes: "" });
+      setNewCustomer({ name: "", phone: "", email: "", address: "", notes: "", status: "جديد" });
       setEditingCustomer(null);
       setIsDialogOpen(false);
     }
@@ -72,6 +88,7 @@ const Customers = () => {
       email: customer.email || "",
       address: customer.address || "",
       notes: customer.notes || "",
+      status: customer.status,
     });
     setIsDialogOpen(true);
   };
@@ -80,7 +97,17 @@ const Customers = () => {
     await deleteCustomer(id);
   };
 
+  const handleStatusChange = async (customerId: string, newStatus: CustomerStatus) => {
+    await updateCustomer(customerId, { status: newStatus });
+  };
+
   const totalBalance = customers.reduce((sum, c) => sum + c.balance, 0);
+
+  // Count customers by status
+  const statusCounts = CUSTOMER_STATUSES.reduce((acc, status) => {
+    acc[status.value] = customers.filter(c => c.status === status.value).length;
+    return acc;
+  }, {} as Record<string, number>);
 
   if (loading) {
     return (
@@ -121,16 +148,41 @@ const Customers = () => {
         <div className="stat-card">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl gradient-success flex items-center justify-center">
-              <span className="text-xl font-bold text-primary-foreground">%</span>
+              <span className="text-xl font-bold text-primary-foreground">✓</span>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">عملاء بدون مستحقات</p>
-              <p className="text-2xl font-bold">
-                {customers.filter((c) => c.balance === 0).length}
-              </p>
+              <p className="text-sm text-muted-foreground">تم التركيب</p>
+              <p className="text-2xl font-bold">{statusCounts['تم التركيب'] || 0}</p>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Status Filter Chips */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        <button
+          onClick={() => setStatusFilter("all")}
+          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            statusFilter === "all"
+              ? "bg-primary text-primary-foreground"
+              : "bg-muted text-muted-foreground hover:bg-muted/80"
+          }`}
+        >
+          الكل ({customers.length})
+        </button>
+        {CUSTOMER_STATUSES.map((status) => (
+          <button
+            key={status.value}
+            onClick={() => setStatusFilter(status.value)}
+            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              statusFilter === status.value
+                ? `${status.color} text-white`
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            }`}
+          >
+            {status.label} ({statusCounts[status.value] || 0})
+          </button>
+        ))}
       </div>
 
       {/* Actions Bar */}
@@ -149,7 +201,7 @@ const Customers = () => {
           setIsDialogOpen(open);
           if (!open) {
             setEditingCustomer(null);
-            setNewCustomer({ name: "", phone: "", email: "", address: "", notes: "" });
+            setNewCustomer({ name: "", phone: "", email: "", address: "", notes: "", status: "جديد" });
           }
         }}>
           <DialogTrigger asChild>
@@ -161,6 +213,9 @@ const Customers = () => {
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>{editingCustomer ? "تعديل العميل" : "إضافة عميل جديد"}</DialogTitle>
+              <DialogDescription>
+                {editingCustomer ? "قم بتعديل بيانات العميل" : "أدخل بيانات العميل الجديد"}
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 mt-4">
               <div className="space-y-2">
@@ -174,13 +229,36 @@ const Customers = () => {
                 />
               </div>
               <div className="space-y-2">
+                <Label>حالة العميل</Label>
+                <Select
+                  value={newCustomer.status}
+                  onValueChange={(value: CustomerStatus) =>
+                    setNewCustomer({ ...newCustomer, status: value })
+                  }
+                >
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="اختر الحالة" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border border-border shadow-lg z-50">
+                    {CUSTOMER_STATUSES.map((status) => (
+                      <SelectItem key={status.value} value={status.value}>
+                        <div className="flex items-center gap-2">
+                          <span className={`w-2 h-2 rounded-full ${status.color}`} />
+                          {status.label}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
                 <Label>رقم الهاتف</Label>
                 <Input
                   value={newCustomer.phone}
                   onChange={(e) =>
                     setNewCustomer({ ...newCustomer, phone: e.target.value })
                   }
-                  placeholder="05xxxxxxxx"
+                  placeholder="09xxxxxxxx"
                 />
               </div>
               <div className="space-y-2">
@@ -229,6 +307,7 @@ const Customers = () => {
           <TableHeader>
             <TableRow className="table-header">
               <TableHead className="text-right">العميل</TableHead>
+              <TableHead className="text-right">الحالة</TableHead>
               <TableHead className="text-right">رقم الهاتف</TableHead>
               <TableHead className="text-right">البريد الإلكتروني</TableHead>
               <TableHead className="text-right">العنوان</TableHead>
@@ -239,7 +318,7 @@ const Customers = () => {
           <TableBody>
             {filteredCustomers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   لا يوجد عملاء. قم بإضافة عميل جديد.
                 </TableCell>
               </TableRow>
@@ -253,6 +332,12 @@ const Customers = () => {
                       </div>
                       <span className="font-medium">{customer.name}</span>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <CustomerStatusBadge
+                      status={customer.status}
+                      onStatusChange={(newStatus) => handleStatusChange(customer.id, newStatus)}
+                    />
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2 text-muted-foreground">
