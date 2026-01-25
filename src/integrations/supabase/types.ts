@@ -155,6 +155,68 @@ export type Database = {
         }
         Relationships: []
       }
+      devices: {
+        Row: {
+          created_at: string
+          customer_id: string | null
+          customer_name: string
+          device_model: string | null
+          device_type: string
+          id: string
+          installation_date: string | null
+          location_details: string | null
+          notes: string | null
+          serial_number: string
+          status: string
+          updated_at: string
+          warranty_end_date: string | null
+          warranty_months: number
+          warranty_start_date: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id?: string | null
+          customer_name: string
+          device_model?: string | null
+          device_type: string
+          id?: string
+          installation_date?: string | null
+          location_details?: string | null
+          notes?: string | null
+          serial_number: string
+          status?: string
+          updated_at?: string
+          warranty_end_date?: string | null
+          warranty_months?: number
+          warranty_start_date?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string | null
+          customer_name?: string
+          device_model?: string | null
+          device_type?: string
+          id?: string
+          installation_date?: string | null
+          location_details?: string | null
+          notes?: string | null
+          serial_number?: string
+          status?: string
+          updated_at?: string
+          warranty_end_date?: string | null
+          warranty_months?: number
+          warranty_start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "devices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoice_items: {
         Row: {
           created_at: string
@@ -252,6 +314,69 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_logs: {
+        Row: {
+          completed_date: string | null
+          cost: number | null
+          created_at: string
+          customer_id: string | null
+          description: string
+          device_id: string
+          id: string
+          is_warranty_claim: boolean | null
+          maintenance_type: string
+          notes: string | null
+          scheduled_date: string | null
+          status: string
+          technician_name: string | null
+        }
+        Insert: {
+          completed_date?: string | null
+          cost?: number | null
+          created_at?: string
+          customer_id?: string | null
+          description: string
+          device_id: string
+          id?: string
+          is_warranty_claim?: boolean | null
+          maintenance_type: string
+          notes?: string | null
+          scheduled_date?: string | null
+          status?: string
+          technician_name?: string | null
+        }
+        Update: {
+          completed_date?: string | null
+          cost?: number | null
+          created_at?: string
+          customer_id?: string | null
+          description?: string
+          device_id?: string
+          id?: string
+          is_warranty_claim?: boolean | null
+          maintenance_type?: string
+          notes?: string | null
+          scheduled_date?: string | null
+          status?: string
+          technician_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_logs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_logs_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "devices"
             referencedColumns: ["id"]
           },
         ]
