@@ -3,11 +3,17 @@ import StatCard from "@/components/dashboard/StatCard";
 import RecentInvoices from "@/components/dashboard/RecentInvoices";
 import LowStockAlert from "@/components/dashboard/LowStockAlert";
 import SalesChart from "@/components/dashboard/SalesChart";
+import QuickActions from "@/components/dashboard/QuickActions";
 import { DollarSign, Package, FileText, Users } from "lucide-react";
 
 const Index = () => {
   return (
     <MainLayout title="لوحة التحكم" subtitle="مرحباً بك في نظام إدارة المبيعات">
+      {/* Quick Actions */}
+      <div className="mb-6">
+        <QuickActions />
+      </div>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <StatCard
