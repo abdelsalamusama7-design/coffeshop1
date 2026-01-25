@@ -4,11 +4,17 @@ import RecentInvoices from "@/components/dashboard/RecentInvoices";
 import LowStockAlert from "@/components/dashboard/LowStockAlert";
 import SalesChart from "@/components/dashboard/SalesChart";
 import QuickActions from "@/components/dashboard/QuickActions";
+import DailyReport from "@/components/dashboard/DailyReport";
 import { DollarSign, Package, FileText, Users } from "lucide-react";
 
 const Index = () => {
   return (
     <MainLayout title="لوحة التحكم" subtitle="مرحباً بك في نظام إدارة المبيعات">
+      {/* Daily Report */}
+      <div className="mb-6">
+        <DailyReport />
+      </div>
+
       {/* Quick Actions */}
       <div className="mb-6">
         <QuickActions />
