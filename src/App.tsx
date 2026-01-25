@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import AdminRoute from "@/components/auth/AdminRoute";
+import RoleRoute from "@/components/auth/RoleRoute";
 import Index from "./pages/Index";
 import Inventory from "./pages/Inventory";
 import Invoices from "./pages/Invoices";
@@ -34,65 +34,65 @@ const App = () => (
             <Route
               path="/"
               element={
-                <ProtectedRoute>
+                <RoleRoute>
                   <Index />
-                </ProtectedRoute>
+                </RoleRoute>
               }
             />
             <Route
               path="/inventory"
               element={
-                <ProtectedRoute>
+                <RoleRoute>
                   <Inventory />
-                </ProtectedRoute>
+                </RoleRoute>
               }
             />
             <Route
               path="/invoices"
               element={
-                <ProtectedRoute>
+                <RoleRoute>
                   <Invoices />
-                </ProtectedRoute>
+                </RoleRoute>
               }
             />
             <Route
               path="/receipts"
               element={
-                <ProtectedRoute>
+                <RoleRoute>
                   <Receipts />
-                </ProtectedRoute>
+                </RoleRoute>
               }
             />
             <Route
               path="/customers"
               element={
-                <ProtectedRoute>
+                <RoleRoute>
                   <Customers />
-                </ProtectedRoute>
+                </RoleRoute>
               }
             />
             <Route
               path="/reports"
               element={
-                <AdminRoute>
+                <RoleRoute>
                   <Reports />
-                </AdminRoute>
+                </RoleRoute>
               }
             />
             <Route
               path="/settings"
               element={
-                <AdminRoute>
+                <RoleRoute allowedRoles={["admin"]}>
                   <Settings />
-                </AdminRoute>
+                </RoleRoute>
               }
             />
             <Route
               path="/users"
               element={
-                <AdminRoute>
+                <RoleRoute allowedRoles={["admin"]}>
                   <UserManagement />
-                </AdminRoute>
+                </RoleRoute>
               }
             />
             <Route path="/forgot-password" element={<ForgotPassword />} />
