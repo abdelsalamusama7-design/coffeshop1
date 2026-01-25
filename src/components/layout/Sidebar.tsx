@@ -15,6 +15,7 @@ import {
   HardHat,
   User,
   FileSpreadsheet,
+  Cpu,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/contexts/AuthContext";
@@ -30,6 +31,7 @@ const navItems = [
   { icon: FileSpreadsheet, label: "عروض الأسعار", path: "/quotations" },
   { icon: Receipt, label: "إيصالات القبض", path: "/receipts" },
   { icon: Users, label: "العملاء", path: "/customers" },
+  { icon: Cpu, label: "الأجهزة والضمانات", path: "/devices" },
   { icon: BarChart3, label: "التقارير", path: "/reports" },
   { icon: Users, label: "المستخدمين", path: "/users" },
   { icon: Settings, label: "إعدادات المنظومة", path: "/settings" },

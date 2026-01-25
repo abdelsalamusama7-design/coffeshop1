@@ -20,6 +20,7 @@ import ResetPassword from "./pages/ResetPassword";
 import UserManagement from "./pages/UserManagement";
 import Profile from "./pages/Profile";
 import Quotations from "./pages/Quotations";
+import Devices from "./pages/Devices";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -87,6 +88,14 @@ const App = () => (
               element={
                 <RoleRoute>
                   <Quotations />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/devices"
+              element={
+                <RoleRoute>
+                  <Devices />
                 </RoleRoute>
               }
             />
