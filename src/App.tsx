@@ -19,6 +19,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import UserManagement from "./pages/UserManagement";
 import Profile from "./pages/Profile";
+import Quotations from "./pages/Quotations";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -78,6 +79,14 @@ const App = () => (
               element={
                 <RoleRoute>
                   <Reports />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/quotations"
+              element={
+                <RoleRoute>
+                  <Quotations />
                 </RoleRoute>
               }
             />

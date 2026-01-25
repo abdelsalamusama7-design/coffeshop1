@@ -14,6 +14,7 @@ import {
   Eye,
   HardHat,
   User,
+  FileSpreadsheet,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,6 +27,7 @@ const navItems = [
   { icon: LayoutDashboard, label: "لوحة التحكم", path: "/" },
   { icon: Package, label: "المخزون", path: "/inventory" },
   { icon: FileText, label: "الفواتير", path: "/invoices" },
+  { icon: FileSpreadsheet, label: "عروض الأسعار", path: "/quotations" },
   { icon: Receipt, label: "إيصالات القبض", path: "/receipts" },
   { icon: Users, label: "العملاء", path: "/customers" },
   { icon: BarChart3, label: "التقارير", path: "/reports" },
