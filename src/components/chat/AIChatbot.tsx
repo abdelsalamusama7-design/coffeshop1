@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Bot, User, Loader2, AlertCircle } from "lucide-react";
+import { X, Send, User, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,12 +13,100 @@ interface Message {
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assistant`;
 
+// Robot Avatar Component
+const RobotAvatar = ({ isAnimating = false, size = "md" }: { isAnimating?: boolean; size?: "sm" | "md" | "lg" }) => {
+  const sizeClasses = {
+    sm: "w-8 h-8",
+    md: "w-12 h-12",
+    lg: "w-16 h-16",
+  };
+
+  return (
+    <div className={cn("relative", sizeClasses[size])}>
+      {/* Robot Head */}
+      <div className="absolute inset-0 bg-gradient-to-b from-primary to-primary/80 rounded-xl shadow-lg">
+        {/* Antenna */}
+        <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-1 h-2 bg-primary rounded-full">
+          <div className={cn(
+            "absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-green-400 rounded-full",
+            isAnimating && "animate-pulse"
+          )} />
+        </div>
+        
+        {/* Eyes Container */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 flex gap-1.5">
+          {/* Left Eye */}
+          <div className="relative">
+            <div className={cn(
+              "w-2.5 h-2.5 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.6)]",
+              isAnimating && "animate-pulse"
+            )}>
+              <div className="absolute top-0.5 left-0.5 w-1 h-1 bg-white/60 rounded-full" />
+            </div>
+          </div>
+          {/* Right Eye */}
+          <div className="relative">
+            <div className={cn(
+              "w-2.5 h-2.5 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.6)]",
+              isAnimating && "animate-pulse"
+            )}>
+              <div className="absolute top-0.5 left-0.5 w-1 h-1 bg-white/60 rounded-full" />
+            </div>
+          </div>
+        </div>
+
+        {/* Mouth/Speaker Grille */}
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-col gap-0.5">
+          <div className={cn(
+            "w-4 h-0.5 bg-cyan-400/80 rounded-full",
+            isAnimating && "animate-pulse"
+          )} />
+          <div className={cn(
+            "w-3 h-0.5 bg-cyan-400/60 rounded-full mx-auto",
+            isAnimating && "animate-pulse"
+          )} />
+        </div>
+
+        {/* Side Details */}
+        <div className="absolute top-1/2 -translate-y-1/2 left-0.5 w-0.5 h-3 bg-cyan-400/40 rounded-full" />
+        <div className="absolute top-1/2 -translate-y-1/2 right-0.5 w-0.5 h-3 bg-cyan-400/40 rounded-full" />
+      </div>
+    </div>
+  );
+};
+
+// Floating Robot Button
+const FloatingRobotButton = ({ onClick, isOpen }: { onClick: () => void; isOpen: boolean }) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "fixed bottom-6 left-6 z-50 group transition-all duration-300",
+      isOpen && "scale-0 pointer-events-none"
+    )}
+  >
+    <div className="relative">
+      {/* Glow Effect */}
+      <div className="absolute inset-0 bg-primary/30 rounded-2xl blur-xl group-hover:bg-primary/50 transition-all" />
+      
+      {/* Robot Container */}
+      <div className="relative bg-gradient-to-br from-card to-muted p-3 rounded-2xl shadow-2xl border-2 border-primary/30 group-hover:border-primary/60 transition-all group-hover:scale-105">
+        <RobotAvatar size="md" isAnimating />
+        
+        {/* Speech Bubble */}
+        <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full shadow-lg animate-bounce">
+          مرحباً!
+        </div>
+      </div>
+    </div>
+  </button>
+);
+
 const AIChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "مرحباً! أنا المساعد الذكي لنظام المراقب. كيف يمكنني مساعدتك اليوم؟",
+      content: "مرحباً! أنا المساعد الذكي لنظام المراقب. كيف يمكنني مساعدتك اليوم؟ 🤖",
     },
   ]);
   const [input, setInput] = useState("");
@@ -106,7 +194,7 @@ const AIChatbot = () => {
     setError(null);
 
     try {
-      await streamChat(newMessages.slice(1)); // Skip initial greeting
+      await streamChat(newMessages.slice(1));
     } catch (e) {
       console.error("Chat error:", e);
       setError(e instanceof Error ? e.message : "حدث خطأ غير متوقع");
@@ -124,47 +212,58 @@ const AIChatbot = () => {
 
   return (
     <>
-      {/* Chat Button */}
-      <Button
-        onClick={() => setIsOpen(true)}
-        className={cn(
-          "fixed bottom-6 left-6 z-50 h-14 w-14 rounded-full shadow-lg",
-          "bg-primary hover:bg-primary/90 transition-all duration-300",
-          isOpen && "scale-0"
-        )}
-        size="icon"
-      >
-        <MessageCircle className="h-6 w-6" />
-      </Button>
+      {/* Floating Robot Button */}
+      <FloatingRobotButton onClick={() => setIsOpen(true)} isOpen={isOpen} />
 
       {/* Chat Window */}
       <div
         className={cn(
-          "fixed bottom-6 left-6 z-50 w-[380px] h-[500px] rounded-2xl shadow-2xl",
-          "bg-card border border-border flex flex-col overflow-hidden",
+          "fixed bottom-6 left-6 z-50 w-[400px] h-[550px] rounded-3xl shadow-2xl",
+          "bg-gradient-to-b from-card to-background border-2 border-primary/20 flex flex-col overflow-hidden",
           "transition-all duration-300 transform origin-bottom-left",
           isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0 pointer-events-none"
         )}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 bg-primary text-primary-foreground">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-              <Bot className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="font-semibold">المساعد الذكي</h3>
-              <p className="text-xs opacity-80">متصل ومستعد للمساعدة</p>
-            </div>
+        {/* Header with Robot */}
+        <div className="relative bg-gradient-to-r from-primary via-primary/90 to-primary/80 p-4">
+          {/* Decorative Circuit Pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-2 left-4 w-20 h-0.5 bg-white" />
+            <div className="absolute top-2 left-24 w-2 h-2 border border-white rounded-full" />
+            <div className="absolute bottom-2 right-4 w-16 h-0.5 bg-white" />
+            <div className="absolute bottom-2 right-20 w-2 h-2 border border-white rounded-full" />
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsOpen(false)}
-            className="text-primary-foreground hover:bg-primary-foreground/20"
-          >
-            <X className="h-5 w-5" />
-          </Button>
+
+          <div className="flex items-center justify-between relative">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <RobotAvatar size="lg" isAnimating={isLoading} />
+                {/* Status Indicator */}
+                <div className={cn(
+                  "absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-primary",
+                  isLoading ? "bg-yellow-400 animate-pulse" : "bg-green-400"
+                )} />
+              </div>
+              <div className="text-primary-foreground">
+                <h3 className="font-bold text-lg">المساعد الذكي</h3>
+                <p className="text-sm opacity-80 flex items-center gap-1">
+                  <span className={cn(
+                    "w-2 h-2 rounded-full",
+                    isLoading ? "bg-yellow-400 animate-pulse" : "bg-green-400"
+                  )} />
+                  {isLoading ? "يفكر..." : "متصل ومستعد"}
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsOpen(false)}
+              className="text-primary-foreground hover:bg-white/20 rounded-full"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
 
         {/* Messages */}
@@ -174,49 +273,51 @@ const AIChatbot = () => {
               <div
                 key={index}
                 className={cn(
-                  "flex gap-2",
+                  "flex gap-3",
                   message.role === "user" ? "flex-row-reverse" : "flex-row"
                 )}
               >
-                <div
-                  className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
-                  )}
-                >
+                {/* Avatar */}
+                <div className="shrink-0">
                   {message.role === "user" ? (
-                    <User className="h-4 w-4" />
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-secondary to-muted flex items-center justify-center border-2 border-secondary">
+                      <User className="h-4 w-4 text-secondary-foreground" />
+                    </div>
                   ) : (
-                    <Bot className="h-4 w-4" />
+                    <RobotAvatar size="sm" isAnimating={isLoading && index === messages.length - 1} />
                   )}
                 </div>
+
+                {/* Message Bubble */}
                 <div
                   className={cn(
-                    "max-w-[75%] rounded-2xl px-4 py-2 text-sm",
+                    "max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-md",
                     message.role === "user"
-                      ? "bg-primary text-primary-foreground rounded-tr-sm"
-                      : "bg-muted rounded-tl-sm"
+                      ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-tr-sm"
+                      : "bg-gradient-to-br from-muted to-muted/80 rounded-tl-sm border border-border"
                   )}
                 >
                   {message.role === "assistant" ? (
-                    <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:m-0 [&>ul]:m-0 [&>ol]:m-0">
+                    <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:m-0 [&>ul]:m-0 [&>ol]:m-0 [&>p]:leading-relaxed">
                       <ReactMarkdown>{message.content}</ReactMarkdown>
                     </div>
                   ) : (
-                    message.content
+                    <p className="leading-relaxed">{message.content}</p>
                   )}
                 </div>
               </div>
             ))}
+
+            {/* Typing Indicator */}
             {isLoading && messages[messages.length - 1]?.role === "user" && (
-              <div className="flex gap-2">
-                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                  <Bot className="h-4 w-4" />
-                </div>
-                <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3">
-                  <Loader2 className="h-4 w-4 animate-spin" />
+              <div className="flex gap-3">
+                <RobotAvatar size="sm" isAnimating />
+                <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3 border border-border">
+                  <div className="flex gap-1.5">
+                    <span className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <span className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <span className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                  </div>
                 </div>
               </div>
             )}
@@ -225,29 +326,34 @@ const AIChatbot = () => {
 
         {/* Error */}
         {error && (
-          <div className="px-4 py-2 bg-destructive/10 text-destructive text-sm flex items-center gap-2">
-            <AlertCircle className="h-4 w-4" />
-            {error}
+          <div className="mx-4 mb-2 px-4 py-2 bg-destructive/10 text-destructive text-sm rounded-xl flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span>{error}</span>
           </div>
         )}
 
         {/* Input */}
-        <div className="p-4 border-t border-border">
+        <div className="p-4 border-t border-border/50 bg-card/50 backdrop-blur-sm">
           <div className="flex gap-2">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="اكتب سؤالك هنا..."
-              className="flex-1"
+              className="flex-1 rounded-xl border-2 border-border/50 focus:border-primary/50 bg-background"
               disabled={isLoading}
             />
             <Button
               onClick={handleSend}
               disabled={!input.trim() || isLoading}
               size="icon"
+              className="rounded-xl w-11 h-11 bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
             >
-              <Send className="h-4 w-4" />
+              {isLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Send className="h-5 w-5" />
+              )}
             </Button>
           </div>
         </div>
