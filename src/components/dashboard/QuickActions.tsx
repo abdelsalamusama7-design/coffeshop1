@@ -17,9 +17,6 @@ import {
   Shield,
   Database,
   HardDrive,
-  AlertTriangle,
-  Clock,
-  CheckCircle,
 } from "lucide-react";
 import { useUserRole } from "@/hooks/useUserRole";
 
@@ -162,30 +159,6 @@ const allActions: QuickAction[] = [
     path: "/users",
     color: "text-fuchsia-600",
     bgColor: "bg-fuchsia-50 hover:bg-fuchsia-100",
-    category: "services",
-  },
-  {
-    icon: AlertTriangle,
-    label: "أصناف منتهية الصلاحية",
-    path: "/inventory",
-    color: "text-red-600",
-    bgColor: "bg-red-50 hover:bg-red-100",
-    category: "services",
-  },
-  {
-    icon: Clock,
-    label: "أصناف قريبة الصلاحية",
-    path: "/inventory",
-    color: "text-yellow-600",
-    bgColor: "bg-yellow-50 hover:bg-yellow-100",
-    category: "services",
-  },
-  {
-    icon: CheckCircle,
-    label: "الصلاحية",
-    path: "/inventory",
-    color: "text-lime-600",
-    bgColor: "bg-lime-50 hover:bg-lime-100",
     category: "services",
   },
 ];
