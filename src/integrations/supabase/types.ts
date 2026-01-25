@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      company_settings: {
+        Row: {
+          address: string | null
+          auto_print: boolean | null
+          auto_tax: boolean | null
+          company_name: string
+          created_at: string
+          daily_summary_email: boolean | null
+          email: string | null
+          id: string
+          invoice_prefix: string | null
+          late_invoice_alert: boolean | null
+          low_stock_alert: boolean | null
+          phone: string | null
+          tax_number: string | null
+          tax_rate: number | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          auto_print?: boolean | null
+          auto_tax?: boolean | null
+          company_name?: string
+          created_at?: string
+          daily_summary_email?: boolean | null
+          email?: string | null
+          id?: string
+          invoice_prefix?: string | null
+          late_invoice_alert?: boolean | null
+          low_stock_alert?: boolean | null
+          phone?: string | null
+          tax_number?: string | null
+          tax_rate?: number | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          auto_print?: boolean | null
+          auto_tax?: boolean | null
+          company_name?: string
+          created_at?: string
+          daily_summary_email?: boolean | null
+          email?: string | null
+          id?: string
+          invoice_prefix?: string | null
+          late_invoice_alert?: boolean | null
+          low_stock_alert?: boolean | null
+          phone?: string | null
+          tax_number?: string | null
+          tax_rate?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           address: string | null
