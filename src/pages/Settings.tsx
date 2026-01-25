@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useCompanySettings } from "@/hooks/useCompanySettings";
 import BackupSection from "@/components/settings/BackupSection";
+import BackupScheduleSection from "@/components/settings/BackupScheduleSection";
 
 const Settings = () => {
   const { settings, isLoading, updateSettings, isUpdating } = useCompanySettings();
@@ -296,6 +297,9 @@ const Settings = () => {
 
         {/* Backup Section */}
         <BackupSection />
+
+        {/* Backup Schedule Section */}
+        <BackupScheduleSection />
       </div>
     </MainLayout>
   );

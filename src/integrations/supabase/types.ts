@@ -14,17 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      backup_logs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          file_size: number | null
+          id: string
+          records_count: Json | null
+          status: string
+          triggered_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          file_size?: number | null
+          id?: string
+          records_count?: Json | null
+          status?: string
+          triggered_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          file_size?: number | null
+          id?: string
+          records_count?: Json | null
+          status?: string
+          triggered_by?: string | null
+        }
+        Relationships: []
+      }
       company_settings: {
         Row: {
           address: string | null
           auto_print: boolean | null
           auto_tax: boolean | null
+          backup_day: number | null
+          backup_email: string | null
+          backup_enabled: boolean | null
+          backup_schedule: string | null
+          backup_time: string | null
           company_name: string
           created_at: string
           daily_summary_email: boolean | null
           email: string | null
           id: string
           invoice_prefix: string | null
+          last_backup_at: string | null
           late_invoice_alert: boolean | null
           low_stock_alert: boolean | null
           phone: string | null
@@ -36,12 +72,18 @@ export type Database = {
           address?: string | null
           auto_print?: boolean | null
           auto_tax?: boolean | null
+          backup_day?: number | null
+          backup_email?: string | null
+          backup_enabled?: boolean | null
+          backup_schedule?: string | null
+          backup_time?: string | null
           company_name?: string
           created_at?: string
           daily_summary_email?: boolean | null
           email?: string | null
           id?: string
           invoice_prefix?: string | null
+          last_backup_at?: string | null
           late_invoice_alert?: boolean | null
           low_stock_alert?: boolean | null
           phone?: string | null
@@ -53,12 +95,18 @@ export type Database = {
           address?: string | null
           auto_print?: boolean | null
           auto_tax?: boolean | null
+          backup_day?: number | null
+          backup_email?: string | null
+          backup_enabled?: boolean | null
+          backup_schedule?: string | null
+          backup_time?: string | null
           company_name?: string
           created_at?: string
           daily_summary_email?: boolean | null
           email?: string | null
           id?: string
           invoice_prefix?: string | null
+          last_backup_at?: string | null
           late_invoice_alert?: boolean | null
           low_stock_alert?: boolean | null
           phone?: string | null
