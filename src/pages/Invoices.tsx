@@ -10,14 +10,25 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Search, Eye, Printer, Download, FileText, X, Loader2, ScanLine } from "lucide-react";
+import { Plus, Search, Eye, Printer, Download, FileText, X, Loader2, ScanLine, Edit, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -52,14 +63,17 @@ const statusStyles: Record<string, string> = {
 };
 
 const Invoices = () => {
-  const { invoices, loading, addInvoice } = useInvoices();
+  const { invoices, loading, addInvoice, updateInvoice, deleteInvoice } = useInvoices();
   const { products } = useProducts();
   const { customers } = useCustomers();
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [showPrintPreview, setShowPrintPreview] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [invoiceToDelete, setInvoiceToDelete] = useState<string | null>(null);
   const [newInvoice, setNewInvoice] = useState({
     customer: "",
     customer_id: "",
@@ -100,10 +114,8 @@ const Invoices = () => {
   };
 
   const handleBarcodeScan = (code: string) => {
-    // Try to find product by SKU or name
     const product = products.find((p) => p.sku === code || p.name === code || p.id === code);
     if (product) {
-      // Add directly to items list with qty 1
       setNewInvoice({
         ...newInvoice,
         items: [...newInvoice.items, { name: product.name, qty: 1, price: product.price }],
@@ -133,9 +145,30 @@ const Invoices = () => {
     return calculateSubtotal() - newInvoice.discount + calculateTax();
   };
 
-  const handleCreateInvoice = async () => {
+  const resetForm = () => {
+    setNewInvoice({ customer: "", customer_id: "", items: [], discount: 0 });
+    setNewItem({ name: "", qty: 1, price: 0, product_id: "" });
+    setEditingInvoice(null);
+  };
+
+  const handleEditInvoice = (invoice: Invoice) => {
+    setEditingInvoice(invoice);
+    setNewInvoice({
+      customer: invoice.customer_name,
+      customer_id: invoice.customer_id || "",
+      items: (invoice.items || []).map((item) => ({
+        name: item.product_name,
+        qty: item.quantity,
+        price: item.unit_price,
+      })),
+      discount: invoice.discount,
+    });
+    setIsDialogOpen(true);
+  };
+
+  const handleCreateOrUpdateInvoice = async () => {
     if (newInvoice.customer && newInvoice.items.length > 0) {
-      await addInvoice({
+      const invoiceData = {
         customer_id: newInvoice.customer_id || undefined,
         customer_name: newInvoice.customer,
         subtotal: calculateSubtotal(),
@@ -148,10 +181,30 @@ const Invoices = () => {
           unit_price: item.price,
           total: item.qty * item.price,
         })),
-      });
-      setNewInvoice({ customer: "", customer_id: "", items: [], discount: 0 });
+      };
+
+      if (editingInvoice) {
+        await updateInvoice(editingInvoice.id, invoiceData);
+      } else {
+        await addInvoice(invoiceData);
+      }
+      
+      resetForm();
       setIsDialogOpen(false);
     }
+  };
+
+  const handleDeleteClick = (invoiceId: string) => {
+    setInvoiceToDelete(invoiceId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (invoiceToDelete) {
+      await deleteInvoice(invoiceToDelete);
+      setInvoiceToDelete(null);
+    }
+    setDeleteDialogOpen(false);
   };
 
   const handlePrint = (invoice: Invoice) => {
@@ -167,7 +220,6 @@ const Invoices = () => {
     window.print();
   };
 
-  // Convert Invoice to format expected by InvoicePrint
   const convertToInvoicePrintFormat = (invoice: Invoice) => ({
     id: invoice.invoice_number,
     customer: invoice.customer_name,
@@ -195,6 +247,24 @@ const Invoices = () => {
 
   return (
     <MainLayout title="إدارة الفواتير" subtitle="إنشاء وإدارة فواتير البيع">
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>هل أنت متأكد من حذف الفاتورة؟</AlertDialogTitle>
+            <AlertDialogDescription>
+              لا يمكن التراجع عن هذا الإجراء. سيتم حذف الفاتورة وجميع بنودها نهائياً.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Barcode Scanner Modal */}
       {showScanner && (
         <BarcodeScanner
@@ -242,7 +312,10 @@ const Invoices = () => {
           />
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) resetForm();
+        }}>
           <DialogTrigger asChild>
             <Button className="gradient-primary border-0">
               <Plus className="w-4 h-4 ml-2" />
@@ -251,17 +324,23 @@ const Invoices = () => {
           </DialogTrigger>
           <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-auto">
             <DialogHeader>
-              <DialogTitle>إنشاء فاتورة جديدة</DialogTitle>
+              <DialogTitle>{editingInvoice ? "تعديل الفاتورة" : "إنشاء فاتورة جديدة"}</DialogTitle>
+              <DialogDescription>
+                {editingInvoice ? `تعديل الفاتورة رقم ${editingInvoice.invoice_number}` : "أدخل بيانات الفاتورة الجديدة"}
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-6 mt-4">
               {/* Customer Selection */}
               <div className="space-y-2">
                 <Label>اختر العميل</Label>
-                <Select onValueChange={handleCustomerSelect}>
-                  <SelectTrigger>
+                <Select 
+                  value={newInvoice.customer_id} 
+                  onValueChange={handleCustomerSelect}
+                >
+                  <SelectTrigger className="bg-background">
                     <SelectValue placeholder="اختر العميل" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-popover border border-border shadow-lg z-50">
                     {customers.map((customer) => (
                       <SelectItem key={customer.id} value={customer.id}>
                         {customer.name}
@@ -288,10 +367,10 @@ const Invoices = () => {
                 </div>
                 <div className="flex gap-3">
                   <Select onValueChange={handleProductSelect}>
-                    <SelectTrigger className="flex-1">
+                    <SelectTrigger className="flex-1 bg-background">
                       <SelectValue placeholder="اختر الصنف" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-popover border border-border shadow-lg z-50">
                       {products.map((product) => (
                         <SelectItem key={product.id} value={product.id}>
                           {product.name} - {product.price} د.ل
@@ -383,11 +462,11 @@ const Invoices = () => {
               </div>
 
               <Button
-                onClick={handleCreateInvoice}
+                onClick={handleCreateOrUpdateInvoice}
                 className="w-full gradient-primary border-0"
                 disabled={!newInvoice.customer || newInvoice.items.length === 0}
               >
-                إنشاء الفاتورة
+                {editingInvoice ? "حفظ التعديلات" : "إنشاء الفاتورة"}
               </Button>
             </div>
           </DialogContent>
@@ -448,6 +527,7 @@ const Invoices = () => {
                         size="icon" 
                         className="h-8 w-8"
                         onClick={() => handlePrint(invoice)}
+                        title="معاينة"
                       >
                         <Eye className="w-4 h-4 text-muted-foreground" />
                       </Button>
@@ -455,7 +535,17 @@ const Invoices = () => {
                         variant="ghost" 
                         size="icon" 
                         className="h-8 w-8"
+                        onClick={() => handleEditInvoice(invoice)}
+                        title="تعديل"
+                      >
+                        <Edit className="w-4 h-4 text-muted-foreground" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
                         onClick={() => handlePrint(invoice)}
+                        title="طباعة"
                       >
                         <Printer className="w-4 h-4 text-muted-foreground" />
                       </Button>
@@ -463,9 +553,10 @@ const Invoices = () => {
                         variant="ghost" 
                         size="icon" 
                         className="h-8 w-8"
-                        onClick={() => handlePrint(invoice)}
+                        onClick={() => handleDeleteClick(invoice.id)}
+                        title="حذف"
                       >
-                        <Download className="w-4 h-4 text-muted-foreground" />
+                        <Trash2 className="w-4 h-4 text-destructive" />
                       </Button>
                     </div>
                   </TableCell>
