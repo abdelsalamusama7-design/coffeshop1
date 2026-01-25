@@ -42,6 +42,7 @@ import BarcodeScanner from "@/components/scanner/BarcodeScanner";
 import { useInvoices, Invoice } from "@/hooks/useInvoices";
 import { useProducts } from "@/hooks/useProducts";
 import { useCustomers } from "@/hooks/useCustomers";
+import { useCompanySettings } from "@/hooks/useCompanySettings";
 import { toast } from "sonner";
 
 interface NewInvoiceItem {
@@ -66,6 +67,7 @@ const Invoices = () => {
   const { invoices, loading, addInvoice, updateInvoice, deleteInvoice } = useInvoices();
   const { products } = useProducts();
   const { customers } = useCustomers();
+  const { settings: companySettings } = useCompanySettings();
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
@@ -294,7 +296,7 @@ const Invoices = () => {
               </div>
             </div>
             <div ref={printRef}>
-              <InvoicePrint invoice={convertToInvoicePrintFormat(selectedInvoice)} />
+              <InvoicePrint invoice={convertToInvoicePrintFormat(selectedInvoice)} companySettings={companySettings} />
             </div>
           </div>
         </div>

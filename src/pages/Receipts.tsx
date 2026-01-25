@@ -31,6 +31,7 @@ import ReceiptPrint from "@/components/receipts/ReceiptPrint";
 import { useReceipts, Receipt as ReceiptType } from "@/hooks/useReceipts";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useInvoices } from "@/hooks/useInvoices";
+import { useCompanySettings } from "@/hooks/useCompanySettings";
 
 const paymentMethods = ["نقدي", "تحويل بنكي", "شبكة مدى", "شيك"];
 
@@ -38,6 +39,7 @@ const Receipts = () => {
   const { receipts, loading, addReceipt } = useReceipts();
   const { customers } = useCustomers();
   const { invoices } = useInvoices();
+  const { settings: companySettings } = useCompanySettings();
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<ReceiptType | null>(null);
@@ -149,7 +151,7 @@ const Receipts = () => {
                 </Button>
               </div>
             </div>
-            <ReceiptPrint receipt={convertToReceiptPrintFormat(selectedReceipt)} />
+            <ReceiptPrint receipt={convertToReceiptPrintFormat(selectedReceipt)} companySettings={companySettings} />
           </div>
         </div>
       )}
