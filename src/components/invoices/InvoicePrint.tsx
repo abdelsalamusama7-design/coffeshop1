@@ -108,10 +108,12 @@ const InvoicePrint = forwardRef<HTMLDivElement, InvoicePrintProps>(
               <span className="text-gray-600">المجموع الفرعي</span>
               <span className="font-semibold">{subtotal.toLocaleString()} د.ل</span>
             </div>
-            {invoice.discount > 0 && (
-              <div className="flex justify-between py-2 border-b text-green-600">
-                <span>الخصم</span>
-                <span className="font-semibold">- {invoice.discount.toLocaleString()} د.ل</span>
+            {invoice.discount !== 0 && (
+              <div className={`flex justify-between py-2 border-b ${invoice.discount > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                <span>خصم الصكوك</span>
+                <span className="font-semibold">
+                  {invoice.discount > 0 ? '-' : '+'} {Math.abs(invoice.discount).toLocaleString()} د.ل
+                </span>
               </div>
             )}
             <div className="flex justify-between py-2 border-b">

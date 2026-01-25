@@ -139,12 +139,18 @@ const Invoices = () => {
     return newInvoice.items.reduce((sum, item) => sum + item.qty * item.price, 0);
   };
 
+  // Calculate discount amount from percentage (can be positive or negative)
+  const calculateDiscountAmount = () => {
+    const subtotal = calculateSubtotal();
+    return (subtotal * newInvoice.discount) / 100;
+  };
+
   const calculateTax = () => {
-    return (calculateSubtotal() - newInvoice.discount) * 0.15;
+    return (calculateSubtotal() - calculateDiscountAmount()) * 0.15;
   };
 
   const calculateTotal = () => {
-    return calculateSubtotal() - newInvoice.discount + calculateTax();
+    return calculateSubtotal() - calculateDiscountAmount() + calculateTax();
   };
 
   const resetForm = () => {
@@ -174,7 +180,7 @@ const Invoices = () => {
         customer_id: newInvoice.customer_id || undefined,
         customer_name: newInvoice.customer,
         subtotal: calculateSubtotal(),
-        discount: newInvoice.discount,
+        discount: calculateDiscountAmount(), // Store actual discount amount
         tax: calculateTax(),
         total: calculateTotal(),
         items: newInvoice.items.map((item) => ({
@@ -439,17 +445,26 @@ const Invoices = () => {
                         <span>{calculateSubtotal().toLocaleString()} د.ل</span>
                       </div>
                       <div className="flex justify-between text-sm items-center">
-                        <span>الخصم</span>
-                        <Input
-                          type="number"
-                          value={newInvoice.discount || ""}
-                          onChange={(e) =>
-                            setNewInvoice({ ...newInvoice, discount: Number(e.target.value) })
-                          }
-                          className="w-32 h-8"
-                          placeholder="0"
-                        />
+                        <span>خصم الصكوك (%)</span>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            value={newInvoice.discount || ""}
+                            onChange={(e) =>
+                              setNewInvoice({ ...newInvoice, discount: Number(e.target.value) })
+                            }
+                            className="w-24 h-8"
+                            placeholder="0"
+                            step="0.1"
+                          />
+                          <span className="text-muted-foreground text-xs w-24 text-left">
+                            {calculateDiscountAmount() >= 0 ? "-" : "+"}{Math.abs(calculateDiscountAmount()).toLocaleString()} د.ل
+                          </span>
+                        </div>
                       </div>
+                      <p className="text-xs text-muted-foreground">
+                        (قيمة موجبة = خصم، قيمة سالبة = زيادة)
+                      </p>
                       <div className="flex justify-between text-sm">
                         <span>الضريبة</span>
                         <span>{calculateTax().toLocaleString()} د.ل</span>
