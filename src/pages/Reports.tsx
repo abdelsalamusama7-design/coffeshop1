@@ -8,7 +8,13 @@ import {
   FileText,
   Download,
   Calendar,
+  MessageCircle,
+  Printer,
 } from "lucide-react";
+import { useCompanySettings } from "@/hooks/useCompanySettings";
+import { useInvoices } from "@/hooks/useInvoices";
+import { useProducts } from "@/hooks/useProducts";
+import { useReceipts } from "@/hooks/useReceipts";
 import {
   BarChart,
   Bar,
@@ -66,6 +72,140 @@ const reportTypes = [
 ];
 
 const Reports = () => {
+  const { settings } = useCompanySettings();
+  const { invoices } = useInvoices();
+  const { products } = useProducts();
+  const { receipts } = useReceipts();
+
+  const today = new Date().toLocaleDateString("ar-LY", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  // Calculate report data
+  const todayInvoices = invoices?.filter(
+    (inv) => new Date(inv.created_at).toDateString() === new Date().toDateString()
+  ) || [];
+  const todaySales = todayInvoices.reduce((sum, inv) => sum + inv.total, 0);
+  const lowStockProducts = products?.filter((p) => p.stock <= p.min_stock) || [];
+  const totalReceipts = receipts?.reduce((sum, r) => sum + r.amount, 0) || 0;
+
+  const generateReportMessage = (reportType: string) => {
+    const companyName = settings?.company_name || "شركة المراقب";
+    let message = `📊 *${companyName}*\n`;
+    message += `📅 التاريخ: ${today}\n\n`;
+
+    switch (reportType) {
+      case "daily":
+        message += `📈 *تقرير المبيعات اليومي*\n`;
+        message += `━━━━━━━━━━━━━━━\n`;
+        message += `عدد الفواتير: ${todayInvoices.length}\n`;
+        message += `إجمالي المبيعات: ${todaySales.toLocaleString()} د.ل\n`;
+        break;
+      case "inventory":
+        message += `📦 *تقرير المخزون*\n`;
+        message += `━━━━━━━━━━━━━━━\n`;
+        message += `إجمالي الأصناف: ${products?.length || 0}\n`;
+        message += `أصناف منخفضة المخزون: ${lowStockProducts.length}\n`;
+        if (lowStockProducts.length > 0) {
+          message += `\n⚠️ *أصناف تحتاج إعادة طلب:*\n`;
+          lowStockProducts.slice(0, 5).forEach((p) => {
+            message += `• ${p.name}: ${p.stock} (الحد الأدنى: ${p.min_stock})\n`;
+          });
+        }
+        break;
+      case "invoices":
+        message += `📄 *تقرير الفواتير*\n`;
+        message += `━━━━━━━━━━━━━━━\n`;
+        message += `إجمالي الفواتير: ${invoices?.length || 0}\n`;
+        const pendingInvoices = invoices?.filter((i) => i.status === "pending") || [];
+        const paidInvoices = invoices?.filter((i) => i.status === "paid") || [];
+        message += `فواتير مدفوعة: ${paidInvoices.length}\n`;
+        message += `فواتير معلقة: ${pendingInvoices.length}\n`;
+        break;
+      case "revenue":
+        message += `💰 *تقرير الإيرادات*\n`;
+        message += `━━━━━━━━━━━━━━━\n`;
+        message += `إجمالي الإيصالات: ${totalReceipts.toLocaleString()} د.ل\n`;
+        message += `إجمالي المبيعات: ${invoices?.reduce((sum, i) => sum + i.total, 0)?.toLocaleString() || 0} د.ل\n`;
+        break;
+    }
+
+    message += `\n━━━━━━━━━━━━━━━\n`;
+    message += `${companyName}\n`;
+    if (settings?.phone) message += `📞 ${settings.phone}`;
+
+    return message;
+  };
+
+  const handleWhatsAppShare = (reportType: string) => {
+    const message = generateReportMessage(reportType);
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/?text=${encodedMessage}`, "_blank");
+  };
+
+  const handlePrint = (reportType: string) => {
+    const message = generateReportMessage(reportType);
+    const printWindow = window.open("", "_blank");
+    if (printWindow) {
+      printWindow.document.write(`
+        <html dir="rtl">
+          <head>
+            <title>تقرير - ${settings?.company_name || "شركة المراقب"}</title>
+            <style>
+              @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+              body {
+                font-family: 'Cairo', sans-serif;
+                padding: 40px;
+                white-space: pre-wrap;
+                line-height: 1.8;
+                font-size: 14px;
+              }
+              @media print {
+                body { padding: 20px; }
+              }
+            </style>
+          </head>
+          <body>${message.replace(/\*/g, "").replace(/\n/g, "<br>")}</body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
+  const reportTypes = [
+    {
+      id: "daily",
+      icon: TrendingUp,
+      title: "تقرير المبيعات اليومي",
+      description: "ملخص مبيعات اليوم مع تفاصيل الفواتير",
+      gradient: "gradient-primary",
+    },
+    {
+      id: "inventory",
+      icon: Package,
+      title: "تقرير المخزون",
+      description: "حالة المخزون الحالية وتنبيهات النفاد",
+      gradient: "gradient-success",
+    },
+    {
+      id: "invoices",
+      icon: FileText,
+      title: "تقرير الفواتير",
+      description: "ملخص الفواتير المدفوعة والمعلقة",
+      gradient: "gradient-warning",
+    },
+    {
+      id: "revenue",
+      icon: BarChart3,
+      title: "تقرير الإيرادات",
+      description: "تحليل الإيرادات والمصروفات",
+      gradient: "gradient-danger",
+    },
+  ];
+
   return (
     <MainLayout title="التقارير" subtitle="عرض وتصدير التقارير المختلفة">
       {/* Quick Reports */}
@@ -82,10 +222,30 @@ const Reports = () => {
             </div>
             <h3 className="font-semibold text-foreground mb-1">{report.title}</h3>
             <p className="text-sm text-muted-foreground mb-4">{report.description}</p>
-            <Button variant="ghost" size="sm" className="text-primary p-0">
-              <Download className="w-4 h-4 ml-1" />
-              تصدير PDF
-            </Button>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button variant="ghost" size="sm" className="text-primary p-0">
+                <Download className="w-4 h-4 ml-1" />
+                PDF
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-emerald-600 dark:text-emerald-400 p-0"
+                onClick={() => handleWhatsAppShare(report.id)}
+              >
+                <MessageCircle className="w-4 h-4 ml-1" />
+                واتساب
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-primary p-0"
+                onClick={() => handlePrint(report.id)}
+              >
+                <Printer className="w-4 h-4 ml-1" />
+                طباعة
+              </Button>
+            </div>
           </Card>
         ))}
       </div>
