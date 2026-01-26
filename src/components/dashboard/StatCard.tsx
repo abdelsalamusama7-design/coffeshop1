@@ -25,14 +25,14 @@ const StatCard = ({
   gradient,
 }: StatCardProps) => {
   return (
-    <div className="stat-card animate-fade-in">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground mb-1">{title}</p>
-          <p className="text-2xl font-bold text-foreground">{value}</p>
+    <div className="stat-card animate-fade-in p-3 md:p-6">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">{title}</p>
+          <p className="text-lg md:text-2xl font-bold text-foreground truncate">{value}</p>
           {change && (
             <p
-              className={`text-xs mt-2 font-medium ${
+              className={`text-[10px] md:text-xs mt-1 md:mt-2 font-medium truncate ${
                 changeType === "positive"
                   ? "text-success"
                   : changeType === "negative"
@@ -45,9 +45,9 @@ const StatCard = ({
           )}
         </div>
         <div
-          className={`w-12 h-12 rounded-xl ${gradientClasses[gradient]} flex items-center justify-center`}
+          className={`w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl ${gradientClasses[gradient]} flex items-center justify-center flex-shrink-0`}
         >
-          <Icon className="w-6 h-6 text-primary-foreground" />
+          <Icon className="w-4 h-4 md:w-6 md:h-6 text-primary-foreground" />
         </div>
       </div>
     </div>

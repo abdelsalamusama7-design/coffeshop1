@@ -11,17 +11,17 @@ const Index = () => {
   return (
     <MainLayout title="لوحة التحكم" subtitle="مرحباً بك في نظام إدارة المبيعات">
       {/* Daily Report */}
-      <div className="mb-6">
+      <div className="mb-4 md:mb-6">
         <DailyReport />
       </div>
 
       {/* Quick Actions */}
-      <div className="mb-6">
+      <div className="mb-4 md:mb-6">
         <QuickActions />
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-4 md:mb-6">
         <StatCard
           title="إجمالي المبيعات"
           value="١٢٥,٤٣٠ د.ل"
@@ -57,7 +57,7 @@ const Index = () => {
       </div>
 
       {/* Charts and Tables Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
         <div className="lg:col-span-2">
           <SalesChart />
         </div>
@@ -67,7 +67,7 @@ const Index = () => {
       </div>
 
       {/* Recent Invoices */}
-      <div className="mt-6">
+      <div className="mt-4 md:mt-6">
         <RecentInvoices />
       </div>
     </MainLayout>
