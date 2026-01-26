@@ -20,8 +20,11 @@ import {
   ChevronRight,
   ChevronLeft,
   Printer,
+  MessageCircle,
+  Mail,
 } from "lucide-react";
 import DailyReportPrint from "./DailyReportPrint";
+import { toast } from "sonner";
 
 interface ReportItem {
   label: string;
@@ -202,6 +205,48 @@ const DailyReport = () => {
     { label: "خسائر البيع", value: 0, color: "bg-red-600" },
   ];
 
+  const handleShareWhatsApp = () => {
+    const dateStr = format(selectedDate, "yyyy-MM-dd");
+    let message = `📊 *التقرير اليومي - ${format(selectedDate, "EEEE، d MMMM yyyy", { locale: ar })}*\n\n`;
+    
+    message += `📈 *ملخص اليوم:*\n`;
+    message += `• عدد الفواتير: ${invoices?.length || 0}\n`;
+    message += `• عدد الإيصالات: ${receipts?.length || 0}\n`;
+    message += `• إجمالي المبيعات: ${formatCurrency(totalSales)} د.ل\n`;
+    message += `• إجمالي الإيصالات: ${formatCurrency(totalReceipts)} د.ل\n\n`;
+    
+    message += `💰 *الإجماليات:*\n`;
+    message += `• الخزينة: ${formatCurrency(treasury)} د.ل\n`;
+    message += `• الأرباح: ${formatCurrency(profit)} د.ل\n\n`;
+    
+    message += `---\nشركة المراقب لكاميرات المراقبة`;
+    
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank");
+    toast.success("تم فتح واتساب للمشاركة");
+  };
+
+  const handleShareEmail = () => {
+    const dateStr = format(selectedDate, "yyyy-MM-dd");
+    const subject = `التقرير اليومي - ${format(selectedDate, "EEEE، d MMMM yyyy", { locale: ar })}`;
+    
+    let body = `التقرير اليومي - ${format(selectedDate, "EEEE، d MMMM yyyy", { locale: ar })}\n\n`;
+    
+    body += `ملخص اليوم:\n`;
+    body += `• عدد الفواتير: ${invoices?.length || 0}\n`;
+    body += `• عدد الإيصالات: ${receipts?.length || 0}\n`;
+    body += `• إجمالي المبيعات: ${formatCurrency(totalSales)} د.ل\n`;
+    body += `• إجمالي الإيصالات: ${formatCurrency(totalReceipts)} د.ل\n\n`;
+    
+    body += `الإجماليات:\n`;
+    body += `• الخزينة: ${formatCurrency(treasury)} د.ل\n`;
+    body += `• الأرباح: ${formatCurrency(profit)} د.ل\n\n`;
+    
+    body += `---\nشركة المراقب لكاميرات المراقبة`;
+    
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    toast.success("تم فتح البريد الإلكتروني");
+  };
+
   const handlePrint = () => {
     const printContent = printRef.current;
     if (!printContent) return;
@@ -332,6 +377,26 @@ const DailyReport = () => {
             >
               <Printer className="h-4 w-4" />
               طباعة
+            </Button>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleShareWhatsApp}
+              className="h-8 gap-1"
+            >
+              <MessageCircle className="h-4 w-4" />
+              واتساب
+            </Button>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleShareEmail}
+              className="h-8 gap-1"
+            >
+              <Mail className="h-4 w-4" />
+              إيميل
             </Button>
           </div>
         </div>
