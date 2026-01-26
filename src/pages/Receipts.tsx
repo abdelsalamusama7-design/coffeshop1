@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import ReceiptPrint from "@/components/receipts/ReceiptPrint";
+import ShareButtons from "@/components/shared/ShareButtons";
 import { useReceipts, Receipt as ReceiptType } from "@/hooks/useReceipts";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useInvoices } from "@/hooks/useInvoices";
@@ -381,14 +382,19 @@ const Receipts = () => {
                       >
                         <Printer className="w-4 h-4 text-muted-foreground" />
                       </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8"
-                        onClick={() => handlePrint(receipt)}
-                      >
-                        <Download className="w-4 h-4 text-muted-foreground" />
-                      </Button>
+                      <ShareButtons
+                        type="receipt"
+                        data={{
+                          title: "إيصال قبض",
+                          customerName: receipt.customer_name,
+                          customerPhone: customers.find(c => c.id === receipt.customer_id)?.phone,
+                          customerEmail: customers.find(c => c.id === receipt.customer_id)?.email || undefined,
+                          documentNumber: receipt.receipt_number,
+                          amount: receipt.amount,
+                          date: new Date(receipt.created_at).toLocaleDateString("ar-SA"),
+                          notes: receipt.notes || undefined,
+                        }}
+                      />
                     </div>
                   </TableCell>
                 </TableRow>

@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/select";
 import InvoicePrint from "@/components/invoices/InvoicePrint";
 import BarcodeScanner from "@/components/scanner/BarcodeScanner";
+import ShareButtons from "@/components/shared/ShareButtons";
 import { useInvoices, Invoice } from "@/hooks/useInvoices";
 import { useProducts } from "@/hooks/useProducts";
 import { useCustomers } from "@/hooks/useCustomers";
@@ -566,6 +567,25 @@ const Invoices = () => {
                       >
                         <Printer className="w-4 h-4 text-muted-foreground" />
                       </Button>
+                      <ShareButtons
+                        type="invoice"
+                        data={{
+                          title: "فاتورة",
+                          customerName: invoice.customer_name,
+                          customerPhone: customers.find(c => c.id === invoice.customer_id)?.phone,
+                          customerEmail: customers.find(c => c.id === invoice.customer_id)?.email || undefined,
+                          documentNumber: invoice.invoice_number,
+                          amount: invoice.total,
+                          date: new Date(invoice.created_at).toLocaleDateString("ar-SA"),
+                          items: (invoice.items || []).map(item => ({
+                            name: item.product_name,
+                            quantity: item.quantity,
+                            price: item.unit_price,
+                            total: item.total,
+                          })),
+                          notes: invoice.notes || undefined,
+                        }}
+                      />
                       <Button 
                         variant="ghost" 
                         size="icon" 

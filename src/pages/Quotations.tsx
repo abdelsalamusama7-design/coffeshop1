@@ -47,12 +47,15 @@ import {
   Eye,
   FileSpreadsheet,
   Send,
+  Share2,
+  Mail,
 } from "lucide-react";
 import { useQuotations, Quotation, QuotationInput, QUOTATION_STATUSES } from "@/hooks/useQuotations";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useCompanySettings } from "@/hooks/useCompanySettings";
 import QuotationForm from "@/components/quotations/QuotationForm";
 import QuotationPrint from "@/components/quotations/QuotationPrint";
+import ShareButtons from "@/components/shared/ShareButtons";
 import { toast } from "sonner";
 
 const Quotations = () => {
@@ -320,6 +323,16 @@ const Quotations = () => {
                             <DropdownMenuItem onClick={() => handleSendWhatsApp(quotation)}>
                               <MessageCircle className="ml-2 h-4 w-4" />
                               إرسال واتساب
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                              const customer = customers.find(c => c.id === quotation.customer_id);
+                              const subject = `عرض سعر رقم ${quotation.quotation_number} - ${quotation.customer_name}`;
+                              const body = `عرض سعر رقم: ${quotation.quotation_number}\nالعميل: ${quotation.customer_name}\nالكاميرات: ${quotation.camera_count} × ${quotation.camera_type}\nالإجمالي: ${quotation.total.toLocaleString()} د.ل\n\n---\nشركة المراقب لكاميرات المراقبة`;
+                              window.location.href = `mailto:${customer?.email || ""}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                              toast.success("تم فتح البريد الإلكتروني");
+                            }}>
+                              <Mail className="ml-2 h-4 w-4" />
+                              إرسال بريد
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
