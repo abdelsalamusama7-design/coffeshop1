@@ -29,7 +29,6 @@ import NotFound from "./pages/NotFound";
 import AIChatbot from "./components/chat/AIChatbot";
 
 // صفحات نظام القهوة الجديد
-import WorkerAuth from "./pages/WorkerAuth";
 import POS from "./pages/POS";
 import Workers from "./pages/Workers";
 import Attendance from "./pages/Attendance";
@@ -47,11 +46,11 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <Routes>
-                {/* الصفحة الرئيسية - توجيه لنقطة البيع */}
-                <Route path="/" element={<Navigate to="/worker-auth" replace />} />
+                {/* الصفحة الرئيسية - توجيه لصفحة تسجيل الدخول */}
+                <Route path="/" element={<Navigate to="/auth" replace />} />
                 
-                {/* نظام تسجيل دخول العمال */}
-                <Route path="/worker-auth" element={<WorkerAuth />} />
+                {/* صفحة تسجيل الدخول الموحدة */}
+                <Route path="/auth" element={<Auth />} />
                 
                 {/* نقطة البيع */}
                 <Route
@@ -82,10 +81,6 @@ const App = () => (
                     </WorkerRoute>
                   }
                 />
-
-                {/* تسجيل دخول المسؤول (النظام الأصلي) */}
-                <Route path="/auth" element={<Auth />} />
-                
                 {/* صفحات النظام الأصلي (للأدمن المتقدم) */}
                 <Route
                   path="/dashboard"

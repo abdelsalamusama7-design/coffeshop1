@@ -810,6 +810,7 @@ export type Database = {
       workers: {
         Row: {
           created_at: string | null
+          email: string | null
           id: string
           is_active: boolean | null
           is_admin: boolean | null
@@ -820,6 +821,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          email?: string | null
           id?: string
           is_active?: boolean | null
           is_admin?: boolean | null
@@ -830,6 +832,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          email?: string | null
           id?: string
           is_active?: boolean | null
           is_admin?: boolean | null
