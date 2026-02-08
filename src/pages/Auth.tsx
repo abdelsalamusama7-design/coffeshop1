@@ -113,13 +113,20 @@ const Auth = () => {
 
   const handleWorkerLogin = async () => {
     // البحث عن العامل بالإيميل
-      const { data: worker, error } = await supabase
-        .from("workers")
-        .select("id, name, is_admin, permissions, pin, email, is_active")
-        .eq("email", formData.email.trim().toLowerCase())
-        .eq("pin", formData.password)
-        .eq("is_active", true)
-        .maybeSingle();
+    const { data, error } = await supabase
+      .from("workers")
+      .select("id, name, is_admin, permissions")
+      .eq("email", formData.email.trim().toLowerCase())
+      .eq("pin", formData.password)
+      .eq("is_active", true)
+      .maybeSingle();
+
+    const worker = data as { 
+      id: string; 
+      name: string; 
+      is_admin: boolean | null; 
+      permissions: WorkerData["permissions"] | null;
+    } | null;
 
     if (error || !worker) {
       toast({
@@ -135,7 +142,7 @@ const Auth = () => {
       id: worker.id,
       name: worker.name,
       is_admin: worker.is_admin || false,
-      permissions: (worker.permissions as WorkerData["permissions"]) || {
+      permissions: worker.permissions || {
         can_sell: true,
         can_view_reports: false,
         can_view_cost: false,
