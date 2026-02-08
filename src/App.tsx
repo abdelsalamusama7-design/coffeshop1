@@ -14,7 +14,6 @@ import NotificationProvider from "@/components/notifications/NotificationProvide
 import Index from "./pages/Index";
 import Inventory from "./pages/Inventory";
 import Invoices from "./pages/Invoices";
-import Receipts from "./pages/Receipts";
 import Customers from "./pages/Customers";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
@@ -23,8 +22,6 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import UserManagement from "./pages/UserManagement";
 import Profile from "./pages/Profile";
-import Quotations from "./pages/Quotations";
-import Devices from "./pages/Devices";
 import NotFound from "./pages/NotFound";
 import AIChatbot from "./components/chat/AIChatbot";
 
@@ -99,22 +96,6 @@ const App = () => (
                   }
                 />
                 <Route
-                  path="/invoices"
-                  element={
-                    <RoleRoute>
-                      <Invoices />
-                    </RoleRoute>
-                  }
-                />
-                <Route
-                  path="/receipts"
-                  element={
-                    <RoleRoute>
-                      <Receipts />
-                    </RoleRoute>
-                  }
-                />
-                <Route
                   path="/customers"
                   element={
                     <RoleRoute>
@@ -128,22 +109,6 @@ const App = () => (
                     <WorkerRoute requiredPermission="can_view_reports">
                       <CoffeeReports />
                     </WorkerRoute>
-                  }
-                />
-                <Route
-                  path="/quotations"
-                  element={
-                    <RoleRoute>
-                      <Quotations />
-                    </RoleRoute>
-                  }
-                />
-                <Route
-                  path="/devices"
-                  element={
-                    <RoleRoute>
-                      <Devices />
-                    </RoleRoute>
                   }
                 />
                 <Route
