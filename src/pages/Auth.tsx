@@ -2,12 +2,15 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useAuth } from "@/contexts/AuthContext";
+import { useWorker } from "@/contexts/WorkerContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Mail, Lock, User, LogIn, UserPlus } from "lucide-react";
+import { Loader2, Mail, Lock, LogIn, Coffee, Shield, User } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 const loginSchema = z.object({
@@ -15,39 +18,140 @@ const loginSchema = z.object({
   password: z.string().min(6, { message: "كلمة المرور يجب أن تكون 6 أحرف على الأقل" }),
 });
 
-const signupSchema = loginSchema.extend({
-  fullName: z.string().trim().min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" }),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "كلمات المرور غير متطابقة",
-  path: ["confirmPassword"],
-});
+type UserType = "admin" | "worker";
+
+interface WorkerData {
+  id: string;
+  name: string;
+  is_admin: boolean;
+  permissions: {
+    can_sell: boolean;
+    can_view_reports: boolean;
+    can_view_cost: boolean;
+    can_edit_products: boolean;
+    can_edit_inventory: boolean;
+    can_manage_workers: boolean;
+  };
+}
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [userType, setUserType] = useState<UserType>("worker");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    confirmPassword: "",
-    fullName: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { signIn, signUp, user, loading: authLoading } = useAuth();
+  const { signIn, user, loading: authLoading } = useAuth();
+  const { login: workerLogin, isLoggedIn: isWorkerLoggedIn } = useWorker();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
+    // إذا كان المستخدم مسجل دخول كأدمن
     if (!authLoading && user) {
-      navigate("/", { replace: true });
+      navigate("/dashboard", { replace: true });
     }
-  }, [user, authLoading, navigate]);
+    // إذا كان المستخدم مسجل دخول كعامل
+    if (isWorkerLoggedIn) {
+      navigate("/pos", { replace: true });
+    }
+  }, [user, authLoading, isWorkerLoggedIn, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const handleAdminLogin = async () => {
+    const { error } = await signIn(formData.email, formData.password);
+    if (error) {
+      if (error.message.includes("Invalid login credentials")) {
+        toast({
+          title: "خطأ في تسجيل الدخول",
+          description: "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "خطأ",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+      return false;
+    }
+
+    // التحقق من دور المستخدم
+    const { data: { user: loggedInUser } } = await supabase.auth.getUser();
+    if (loggedInUser) {
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", loggedInUser.id)
+        .maybeSingle();
+
+      if (!roleData || roleData.role !== "admin") {
+        await supabase.auth.signOut();
+        toast({
+          title: "غير مصرح",
+          description: "هذا الحساب ليس حساب مسؤول",
+          variant: "destructive",
+        });
+        return false;
+      }
+    }
+
+    toast({
+      title: "مرحباً بك",
+      description: "تم تسجيل الدخول كمسؤول بنجاح",
+    });
+    return true;
+  };
+
+  const handleWorkerLogin = async () => {
+    // البحث عن العامل بالإيميل
+      const { data: worker, error } = await supabase
+        .from("workers")
+        .select("id, name, is_admin, permissions, pin, email, is_active")
+        .eq("email", formData.email.trim().toLowerCase())
+        .eq("pin", formData.password)
+        .eq("is_active", true)
+        .maybeSingle();
+
+    if (error || !worker) {
+      toast({
+        title: "خطأ في تسجيل الدخول",
+        description: "البريد الإلكتروني أو الرقم السري غير صحيح",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    // حفظ بيانات العامل
+    const workerData: WorkerData = {
+      id: worker.id,
+      name: worker.name,
+      is_admin: worker.is_admin || false,
+      permissions: (worker.permissions as WorkerData["permissions"]) || {
+        can_sell: true,
+        can_view_reports: false,
+        can_view_cost: false,
+        can_edit_products: false,
+        can_edit_inventory: false,
+        can_manage_workers: false,
+      },
+    };
+
+    workerLogin(workerData);
+
+    toast({
+      title: `مرحباً ${worker.name}`,
+      description: "تم تسجيل الدخول بنجاح",
+    });
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,81 +160,37 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      if (isLogin) {
-        const result = loginSchema.safeParse(formData);
-        if (!result.success) {
-          const fieldErrors: Record<string, string> = {};
-          result.error.errors.forEach((err) => {
-            if (err.path[0]) {
-              fieldErrors[err.path[0] as string] = err.message;
-            }
-          });
-          setErrors(fieldErrors);
-          setLoading(false);
-          return;
-        }
-
-        const { error } = await signIn(formData.email, formData.password);
-        if (error) {
-          if (error.message.includes("Invalid login credentials")) {
-            toast({
-              title: "خطأ في تسجيل الدخول",
-              description: "البريد الإلكتروني أو كلمة المرور غير صحيحة",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "خطأ",
-              description: error.message,
-              variant: "destructive",
-            });
+      const result = loginSchema.safeParse(formData);
+      if (!result.success) {
+        const fieldErrors: Record<string, string> = {};
+        result.error.errors.forEach((err) => {
+          if (err.path[0]) {
+            fieldErrors[err.path[0] as string] = err.message;
           }
-        } else {
-          toast({
-            title: "تم تسجيل الدخول بنجاح",
-            description: "مرحباً بك مرة أخرى!",
-          });
-        }
+        });
+        setErrors(fieldErrors);
+        setLoading(false);
+        return;
+      }
+
+      let success = false;
+      if (userType === "admin") {
+        success = await handleAdminLogin();
       } else {
-        const result = signupSchema.safeParse(formData);
-        if (!result.success) {
-          const fieldErrors: Record<string, string> = {};
-          result.error.errors.forEach((err) => {
-            if (err.path[0]) {
-              fieldErrors[err.path[0] as string] = err.message;
-            }
-          });
-          setErrors(fieldErrors);
-          setLoading(false);
-          return;
-        }
+        success = await handleWorkerLogin();
+      }
 
-        const { error } = await signUp(formData.email, formData.password, formData.fullName);
-        if (error) {
-          if (error.message.includes("User already registered")) {
-            toast({
-              title: "خطأ في التسجيل",
-              description: "هذا البريد الإلكتروني مسجل مسبقاً",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "خطأ",
-              description: error.message,
-              variant: "destructive",
-            });
-          }
+      if (success) {
+        if (userType === "admin") {
+          navigate("/dashboard", { replace: true });
         } else {
-          toast({
-            title: "تم إنشاء الحساب بنجاح",
-            description: "مرحباً بك في نظام المراقب!",
-          });
+          navigate("/pos", { replace: true });
         }
       }
     } catch (err) {
       toast({
         title: "خطأ غير متوقع",
-        description: "حدث خطأ أثناء العملية",
+        description: "حدث خطأ أثناء تسجيل الدخول",
         variant: "destructive",
       });
     } finally {
@@ -150,47 +210,64 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/50 to-background p-4">
       <Card className="w-full max-w-md shadow-card border-border/50">
         <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-20 h-20 rounded-2xl gradient-primary flex items-center justify-center shadow-lg">
-            <img src={logo} alt="Logo" className="w-14 h-14 object-contain" />
+          <div className="mx-auto w-24 h-24 rounded-full gradient-primary flex items-center justify-center shadow-lg">
+            <Coffee className="w-12 h-12 text-primary-foreground" />
           </div>
           <div>
-            <CardTitle className="text-2xl font-bold">
-              {isLogin ? "تسجيل الدخول" : "إنشاء حساب جديد"}
+            <CardTitle className="text-2xl font-bold text-foreground">
+              محل القهوة والمشروبات
             </CardTitle>
-            <CardDescription className="mt-2">
-              {isLogin
-                ? "أدخل بياناتك للوصول إلى لوحة التحكم"
-                : "أدخل بياناتك لإنشاء حساب جديد"}
+            <CardDescription className="mt-2 text-muted-foreground">
+              أدخل بياناتك لتسجيل الدخول
             </CardDescription>
           </div>
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
-              <div className="space-y-2">
-                <Label htmlFor="fullName">الاسم الكامل</Label>
-                <div className="relative">
-                  <User className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="fullName"
-                    name="fullName"
-                    type="text"
-                    placeholder="أدخل اسمك الكامل"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    className="pr-10"
-                    disabled={loading}
-                  />
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* اختيار نوع المستخدم */}
+            <div className="space-y-3">
+              <Label className="text-foreground">نوع الحساب</Label>
+              <RadioGroup
+                value={userType}
+                onValueChange={(value) => setUserType(value as UserType)}
+                className="flex gap-4"
+                disabled={loading}
+              >
+                <div className="flex-1">
+                  <Label
+                    htmlFor="worker"
+                    className={`flex items-center justify-center gap-2 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      userType === "worker"
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    <RadioGroupItem value="worker" id="worker" className="sr-only" />
+                    <User className="h-5 w-5" />
+                    <span className="font-medium">عامل</span>
+                  </Label>
                 </div>
-                {errors.fullName && (
-                  <p className="text-sm text-destructive">{errors.fullName}</p>
-                )}
-              </div>
-            )}
+                <div className="flex-1">
+                  <Label
+                    htmlFor="admin"
+                    className={`flex items-center justify-center gap-2 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      userType === "admin"
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    <RadioGroupItem value="admin" id="admin" className="sr-only" />
+                    <Shield className="h-5 w-5" />
+                    <span className="font-medium">مسؤول</span>
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
 
+            {/* البريد الإلكتروني */}
             <div className="space-y-2">
-              <Label htmlFor="email">البريد الإلكتروني</Label>
+              <Label htmlFor="email" className="text-foreground">البريد الإلكتروني</Label>
               <div className="relative">
                 <Mail className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -200,9 +277,10 @@ const Auth = () => {
                   placeholder="example@email.com"
                   value={formData.email}
                   onChange={handleChange}
-                  className="pr-10"
+                  className="pr-10 bg-card border-border"
                   dir="ltr"
                   disabled={loading}
+                  autoComplete="email"
                 />
               </div>
               {errors.email && (
@@ -210,20 +288,25 @@ const Auth = () => {
               )}
             </div>
 
+            {/* كلمة المرور / الرقم السري */}
             <div className="space-y-2">
-              <Label htmlFor="password">كلمة المرور</Label>
+              <Label htmlFor="password" className="text-foreground">
+                {userType === "admin" ? "كلمة المرور" : "الرقم السري"}
+              </Label>
               <div className="relative">
                 <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="password"
                   name="password"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder={userType === "admin" ? "••••••••" : "••••"}
                   value={formData.password}
                   onChange={handleChange}
-                  className="pr-10"
+                  className="pr-10 bg-card border-border"
                   dir="ltr"
                   disabled={loading}
+                  autoComplete={userType === "admin" ? "current-password" : "off"}
+                  inputMode={userType === "worker" ? "numeric" : "text"}
                 />
               </div>
               {errors.password && (
@@ -231,68 +314,28 @@ const Auth = () => {
               )}
             </div>
 
-            {!isLogin && (
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">تأكيد كلمة المرور</Label>
-                <div className="relative">
-                  <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className="pr-10"
-                    dir="ltr"
-                    disabled={loading}
-                  />
-                </div>
-                {errors.confirmPassword && (
-                  <p className="text-sm text-destructive">{errors.confirmPassword}</p>
-                )}
-              </div>
-            )}
-
-            <Button type="submit" className="w-full gap-2" disabled={loading}>
+            <Button type="submit" className="w-full h-12 text-lg gap-2" disabled={loading}>
               {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : isLogin ? (
-                <>
-                  <LogIn className="h-4 w-4" />
-                  تسجيل الدخول
-                </>
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
                 <>
-                  <UserPlus className="h-4 w-4" />
-                  إنشاء حساب
+                  <LogIn className="h-5 w-5" />
+                  تسجيل الدخول
                 </>
               )}
             </Button>
           </form>
 
-          <div className="mt-6 text-center space-y-2">
-            <button
-              type="button"
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setErrors({});
-                setFormData({ email: "", password: "", confirmPassword: "", fullName: "" });
-              }}
-              className="text-sm text-primary hover:underline block w-full"
-              disabled={loading}
-            >
-              {isLogin ? "ليس لديك حساب؟ سجل الآن" : "لديك حساب؟ سجل دخولك"}
-            </button>
-            {isLogin && (
+          {userType === "admin" && (
+            <div className="mt-4 text-center">
               <a
                 href="/forgot-password"
-                className="text-sm text-muted-foreground hover:text-primary hover:underline block"
+                className="text-sm text-muted-foreground hover:text-primary hover:underline"
               >
                 نسيت كلمة المرور؟
               </a>
-            )}
-          </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
