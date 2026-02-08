@@ -34,7 +34,8 @@ import {
 import { useState } from "react";
 
 const navItems = [
-  { icon: LayoutDashboard, label: "لوحة التحكم", path: "/" },
+  { icon: LayoutDashboard, label: "الصفحة الرئيسية", path: "/home" },
+  { icon: BarChart3, label: "لوحة التحكم", path: "/dashboard" },
   { icon: Package, label: "المخزون", path: "/inventory" },
   { icon: FileText, label: "الفواتير", path: "/invoices" },
   { icon: Users, label: "العملاء", path: "/customers" },

@@ -31,7 +31,7 @@ import { useProducts, Product, ProductInput } from "@/hooks/useProducts";
 import BarcodeScanner from "@/components/scanner/BarcodeScanner";
 import { toast } from "sonner";
 
-const categories = ["كاميرات", "أجهزة تسجيل", "كابلات", "ملحقات", "تخزين", "عام"];
+const categories = ["مشروبات ساخنة", "مشروبات باردة", "مياه غازية", "مياه معدنية", "عصائر", "أخرى", "مواد خام"];
 
 const Inventory = () => {
   const { products, loading, addProduct, updateProduct, deleteProduct } = useProducts();
