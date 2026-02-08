@@ -68,6 +68,31 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // ألوان أقسام المنتجات
+        coffee: {
+          DEFAULT: "hsl(var(--coffee))",
+          foreground: "hsl(var(--coffee-foreground))",
+        },
+        tea: {
+          DEFAULT: "hsl(var(--tea))",
+          foreground: "hsl(var(--tea-foreground))",
+        },
+        "cold-drinks": {
+          DEFAULT: "hsl(var(--cold-drinks))",
+          foreground: "hsl(var(--cold-drinks-foreground))",
+        },
+        water: {
+          DEFAULT: "hsl(var(--water))",
+          foreground: "hsl(var(--water-foreground))",
+        },
+        juice: {
+          DEFAULT: "hsl(var(--juice))",
+          foreground: "hsl(var(--juice-foreground))",
+        },
+        other: {
+          DEFAULT: "hsl(var(--other))",
+          foreground: "hsl(var(--other-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

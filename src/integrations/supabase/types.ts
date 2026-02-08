@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      attendance: {
+        Row: {
+          check_in_time: string | null
+          check_out_time: string | null
+          created_at: string | null
+          date: string
+          id: string
+          notes: string | null
+          worker_id: string
+        }
+        Insert: {
+          check_in_time?: string | null
+          check_out_time?: string | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          notes?: string | null
+          worker_id: string
+        }
+        Update: {
+          check_in_time?: string | null
+          check_out_time?: string | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          notes?: string | null
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "workers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       backup_logs: {
         Row: {
           created_at: string
@@ -216,6 +254,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      drink_cost_settings: {
+        Row: {
+          coffee_cost: number | null
+          created_at: string | null
+          cup_cost: number | null
+          id: string
+          milk_cost: number | null
+          name: string
+          sugar_cost: number | null
+          tea_cost: number | null
+          total_cost: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          coffee_cost?: number | null
+          created_at?: string | null
+          cup_cost?: number | null
+          id?: string
+          milk_cost?: number | null
+          name: string
+          sugar_cost?: number | null
+          tea_cost?: number | null
+          total_cost?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          coffee_cost?: number | null
+          created_at?: string | null
+          cup_cost?: number | null
+          id?: string
+          milk_cost?: number | null
+          name?: string
+          sugar_cost?: number | null
+          tea_cost?: number | null
+          total_cost?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       invoice_items: {
         Row: {
@@ -486,6 +563,66 @@ export type Database = {
         }
         Relationships: []
       }
+      quick_sales: {
+        Row: {
+          category: string
+          cost_price: number
+          created_at: string | null
+          id: string
+          product_id: string | null
+          product_name: string
+          profit: number | null
+          quantity: number | null
+          sale_date: string | null
+          total: number
+          unit_price: number
+          worker_id: string | null
+        }
+        Insert: {
+          category: string
+          cost_price?: number
+          created_at?: string | null
+          id?: string
+          product_id?: string | null
+          product_name: string
+          profit?: number | null
+          quantity?: number | null
+          sale_date?: string | null
+          total: number
+          unit_price: number
+          worker_id?: string | null
+        }
+        Update: {
+          category?: string
+          cost_price?: number
+          created_at?: string | null
+          id?: string
+          product_id?: string | null
+          product_name?: string
+          profit?: number | null
+          quantity?: number | null
+          sale_date?: string | null
+          total?: number
+          unit_price?: number
+          worker_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quick_sales_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quick_sales_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "workers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quotation_items: {
         Row: {
           created_at: string
@@ -667,6 +804,39 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      workers: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          is_admin: boolean | null
+          name: string
+          permissions: Json | null
+          pin: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_admin?: boolean | null
+          name: string
+          permissions?: Json | null
+          pin: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_admin?: boolean | null
+          name?: string
+          permissions?: Json | null
+          pin?: string
+          updated_at?: string | null
         }
         Relationships: []
       }

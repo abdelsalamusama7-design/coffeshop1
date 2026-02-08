@@ -7,30 +7,31 @@
 @import '@fontsource/cairo/600.css';
 @import '@fontsource/cairo/700.css';
 
-/* نظام التصميم - شركة المراقب */
+/* نظام التصميم - محل القهوة والمشروبات */
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 215 25% 15%;
+    /* وضع داكن افتراضي - ألوان القهوة */
+    --background: 25 20% 8%;
+    --foreground: 35 30% 95%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card: 25 18% 12%;
+    --card-foreground: 35 30% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover: 25 18% 12%;
+    --popover-foreground: 35 30% 95%;
 
-    --primary: 215 70% 45%;
+    --primary: 30 75% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 15% 93%;
-    --secondary-foreground: 215 25% 25%;
+    --secondary: 25 15% 18%;
+    --secondary-foreground: 35 25% 90%;
 
-    --muted: 210 15% 95%;
-    --muted-foreground: 215 15% 50%;
+    --muted: 25 15% 15%;
+    --muted-foreground: 35 15% 55%;
 
-    --accent: 200 80% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 35 85% 55%;
+    --accent-foreground: 25 20% 8%;
 
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
@@ -41,78 +42,48 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 214 20% 88%;
-    --input: 214 20% 88%;
-    --ring: 215 70% 45%;
+    --border: 25 18% 20%;
+    --input: 25 18% 20%;
+    --ring: 30 75% 45%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 215 30% 18%;
-    --sidebar-foreground: 210 20% 95%;
-    --sidebar-primary: 200 80% 55%;
+    --sidebar-background: 25 22% 6%;
+    --sidebar-foreground: 35 25% 92%;
+    --sidebar-primary: 30 75% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 25% 25%;
-    --sidebar-accent-foreground: 210 20% 95%;
-    --sidebar-border: 215 20% 25%;
-    --sidebar-ring: 200 80% 55%;
+    --sidebar-accent: 25 18% 12%;
+    --sidebar-accent-foreground: 35 25% 92%;
+    --sidebar-border: 25 15% 15%;
+    --sidebar-ring: 30 75% 50%;
+
+    /* ألوان الأقسام */
+    --coffee: 25 70% 35%;
+    --coffee-foreground: 0 0% 100%;
+    --tea: 145 50% 35%;
+    --tea-foreground: 0 0% 100%;
+    --cold-drinks: 200 70% 45%;
+    --cold-drinks-foreground: 0 0% 100%;
+    --water: 195 80% 50%;
+    --water-foreground: 0 0% 100%;
+    --juice: 35 85% 50%;
+    --juice-foreground: 25 20% 10%;
+    --other: 270 50% 45%;
+    --other-foreground: 0 0% 100%;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(215 70% 45%) 0%, hsl(200 80% 50%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(30 75% 45%) 0%, hsl(35 85% 55%) 100%);
     --gradient-success: linear-gradient(135deg, hsl(145 65% 42%) 0%, hsl(160 60% 45%) 100%);
     --gradient-warning: linear-gradient(135deg, hsl(38 92% 50%) 0%, hsl(25 95% 55%) 100%);
     --gradient-danger: linear-gradient(135deg, hsl(0 70% 55%) 0%, hsl(15 75% 50%) 100%);
-    --gradient-sidebar: linear-gradient(180deg, hsl(215 30% 18%) 0%, hsl(215 35% 12%) 100%);
+    --gradient-sidebar: linear-gradient(180deg, hsl(25 22% 6%) 0%, hsl(25 25% 4%) 100%);
+    --gradient-coffee: linear-gradient(135deg, hsl(25 70% 35%) 0%, hsl(30 65% 25%) 100%);
 
     /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(215 25% 15% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(215 25% 15% / 0.1), 0 2px 4px -2px hsl(215 25% 15% / 0.1);
-    --shadow-lg: 0 10px 15px -3px hsl(215 25% 15% / 0.1), 0 4px 6px -4px hsl(215 25% 15% / 0.1);
-    --shadow-card: 0 2px 8px -2px hsl(215 25% 15% / 0.08), 0 4px 16px -4px hsl(215 25% 15% / 0.12);
-  }
-
-  .dark {
-    --background: 215 30% 10%;
-    --foreground: 210 20% 95%;
-
-    --card: 215 25% 14%;
-    --card-foreground: 210 20% 95%;
-
-    --popover: 215 25% 14%;
-    --popover-foreground: 210 20% 95%;
-
-    --primary: 200 80% 55%;
-    --primary-foreground: 215 30% 10%;
-
-    --secondary: 215 20% 20%;
-    --secondary-foreground: 210 20% 90%;
-
-    --muted: 215 20% 18%;
-    --muted-foreground: 215 15% 60%;
-
-    --accent: 200 80% 55%;
-    --accent-foreground: 215 30% 10%;
-
-    --destructive: 0 65% 50%;
-    --destructive-foreground: 0 0% 100%;
-
-    --success: 145 60% 45%;
-    --success-foreground: 0 0% 100%;
-
-    --warning: 38 90% 55%;
-    --warning-foreground: 0 0% 100%;
-
-    --border: 215 20% 22%;
-    --input: 215 20% 22%;
-    --ring: 200 80% 55%;
-
-    --sidebar-background: 215 35% 8%;
-    --sidebar-foreground: 210 20% 90%;
-    --sidebar-primary: 200 80% 55%;
-    --sidebar-primary-foreground: 215 30% 10%;
-    --sidebar-accent: 215 25% 15%;
-    --sidebar-accent-foreground: 210 20% 90%;
-    --sidebar-border: 215 20% 15%;
-    --sidebar-ring: 200 80% 55%;
+    --shadow-sm: 0 1px 2px 0 hsl(25 25% 5% / 0.3);
+    --shadow-md: 0 4px 6px -1px hsl(25 25% 5% / 0.4), 0 2px 4px -2px hsl(25 25% 5% / 0.3);
+    --shadow-lg: 0 10px 15px -3px hsl(25 25% 5% / 0.4), 0 4px 6px -4px hsl(25 25% 5% / 0.3);
+    --shadow-card: 0 2px 8px -2px hsl(25 25% 5% / 0.4), 0 4px 16px -4px hsl(25 25% 5% / 0.5);
   }
 }
 
