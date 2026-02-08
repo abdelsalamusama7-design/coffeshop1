@@ -150,7 +150,7 @@ const Settings = () => {
               <Input 
                 value={address} 
                 onChange={(e) => setAddress(e.target.value)}
-                placeholder="طرابلس، ليبيا"
+                placeholder="القاهرة، مصر"
               />
             </div>
           </div>

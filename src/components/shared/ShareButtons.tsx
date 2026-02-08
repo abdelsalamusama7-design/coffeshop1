@@ -31,7 +31,7 @@ interface ShareButtonsProps {
 }
 
 const formatCurrency = (amount: number) => {
-  return `${amount.toLocaleString()} د.ل`;
+  return `${amount.toLocaleString()} ج.م`;
 };
 
 const generateWhatsAppMessage = (data: ShareData, type: string): string => {
@@ -179,9 +179,9 @@ export const ShareButtons = ({ data, type }: ShareButtonsProps) => {
     // If customer has phone, send directly to them
     if (data.customerPhone) {
       // Clean phone number - remove spaces and ensure it starts with country code
-      let phone = data.customerPhone.replace(/\s+/g, "").replace(/^0/, "218");
-      if (!phone.startsWith("+") && !phone.startsWith("218")) {
-        phone = "218" + phone;
+      let phone = data.customerPhone.replace(/\s+/g, "").replace(/^0/, "20");
+      if (!phone.startsWith("+") && !phone.startsWith("20")) {
+        phone = "20" + phone;
       }
       window.open(`https://wa.me/${phone}?text=${encodedMessage}`, "_blank");
     } else {

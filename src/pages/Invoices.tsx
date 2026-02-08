@@ -382,7 +382,7 @@ const Invoices = () => {
                     <SelectContent className="bg-popover border border-border shadow-lg z-50">
                       {products.map((product) => (
                         <SelectItem key={product.id} value={product.id}>
-                          {product.name} - {product.price} د.ل
+                          {product.name} - {product.price} ج.م
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -424,9 +424,9 @@ const Invoices = () => {
                       <div key={index} className="p-3 grid grid-cols-5 gap-4 items-center text-sm">
                         <span className="col-span-2 font-medium">{item.name}</span>
                         <span>{item.qty}</span>
-                        <span>{item.price} د.ل</span>
+                        <span>{item.price} ج.م</span>
                         <div className="flex items-center justify-between">
-                          <span className="font-semibold">{item.qty * item.price} د.ل</span>
+                          <span className="font-semibold">{item.qty * item.price} ج.م</span>
                           <Button
                             variant="ghost"
                             size="icon"
@@ -443,7 +443,7 @@ const Invoices = () => {
                     <div className="p-3 bg-muted/20 space-y-2">
                       <div className="flex justify-between text-sm">
                         <span>المجموع الفرعي</span>
-                        <span>{calculateSubtotal().toLocaleString()} د.ل</span>
+                        <span>{calculateSubtotal().toLocaleString()} ج.م</span>
                       </div>
                       <div className="flex justify-between text-sm items-center">
                         <span>خصم الصكوك (%)</span>
@@ -459,7 +459,7 @@ const Invoices = () => {
                             step="0.1"
                           />
                           <span className="text-muted-foreground text-xs w-24 text-left">
-                            {calculateDiscountAmount() >= 0 ? "-" : "+"}{Math.abs(calculateDiscountAmount()).toLocaleString()} د.ل
+                            {calculateDiscountAmount() >= 0 ? "-" : "+"}{Math.abs(calculateDiscountAmount()).toLocaleString()} ج.م
                           </span>
                         </div>
                       </div>
@@ -468,11 +468,11 @@ const Invoices = () => {
                       </p>
                       <div className="flex justify-between text-sm">
                         <span>الضريبة</span>
-                        <span>{calculateTax().toLocaleString()} د.ل</span>
+                        <span>{calculateTax().toLocaleString()} ج.م</span>
                       </div>
                       <div className="flex justify-between font-bold text-lg pt-2 border-t">
                         <span>الإجمالي</span>
-                        <span className="text-primary">{calculateTotal().toLocaleString()} د.ل</span>
+                        <span className="text-primary">{calculateTotal().toLocaleString()} ج.م</span>
                       </div>
                     </div>
                   </div>
@@ -528,7 +528,7 @@ const Invoices = () => {
                     {new Date(invoice.created_at).toLocaleDateString("ar-SA")}
                   </TableCell>
                   <TableCell>{invoice.items?.length || 0} أصناف</TableCell>
-                  <TableCell className="font-bold">{invoice.total.toLocaleString()} د.ل</TableCell>
+                  <TableCell className="font-bold">{invoice.total.toLocaleString()} ج.م</TableCell>
                   <TableCell>
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium ${

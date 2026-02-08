@@ -2,11 +2,11 @@ import { FileText, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const invoices = [
-  { id: "INV-001", customer: "محمد أحمد", amount: "٢,٥٠٠ د.ل", status: "مدفوعة", date: "٢٠٢٤/٠١/١٥" },
-  { id: "INV-002", customer: "شركة الأمان", amount: "١٥,٠٠٠ د.ل", status: "معلقة", date: "٢٠٢٤/٠١/١٤" },
-  { id: "INV-003", customer: "أحمد السعيد", amount: "٣,٢٠٠ د.ل", status: "مدفوعة", date: "٢٠٢٤/٠١/١٣" },
-  { id: "INV-004", customer: "مؤسسة النور", amount: "٨,٧٠٠ د.ل", status: "متأخرة", date: "٢٠٢٤/٠١/١٢" },
-  { id: "INV-005", customer: "خالد العمري", amount: "١,٨٠٠ د.ل", status: "مدفوعة", date: "٢٠٢٤/٠١/١١" },
+  { id: "INV-001", customer: "محمد أحمد", amount: "٢,٥٠٠ ج.م", status: "مدفوعة", date: "٢٠٢٤/٠١/١٥" },
+  { id: "INV-002", customer: "شركة الأمان", amount: "١٥,٠٠٠ ج.م", status: "معلقة", date: "٢٠٢٤/٠١/١٤" },
+  { id: "INV-003", customer: "أحمد السعيد", amount: "٣,٢٠٠ ج.م", status: "مدفوعة", date: "٢٠٢٤/٠١/١٣" },
+  { id: "INV-004", customer: "مؤسسة النور", amount: "٨,٧٠٠ ج.م", status: "متأخرة", date: "٢٠٢٤/٠١/١٢" },
+  { id: "INV-005", customer: "خالد العمري", amount: "١,٨٠٠ ج.م", status: "مدفوعة", date: "٢٠٢٤/٠١/١١" },
 ];
 
 const statusStyles = {

@@ -21,7 +21,7 @@ interface DailyReportPrintProps {
 }
 
 const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat("ar-LY", {
+  return new Intl.NumberFormat("ar-EG", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
@@ -44,7 +44,7 @@ const ReportSection = ({
       {items.map((item, index) => (
         <div key={index} className="flex justify-between p-2 text-sm">
           <span className="font-medium">{item.label}</span>
-          <span className="font-bold">{formatCurrency(item.value)} د.ل</span>
+          <span className="font-bold">{formatCurrency(item.value)} ج.م</span>
         </div>
       ))}
     </div>
@@ -144,9 +144,9 @@ const DailyReportPrint = ({
       {/* Footer */}
       <div className="mt-6 pt-4 border-t-2 border-gray-300 text-center text-sm text-gray-500">
         <p>
-          {settings?.address || "ليبيا، طرابلس"} | هاتف: {settings?.phone || "0912345678"} | البريد: {settings?.email || "info@almoraqib.ly"}
+          {settings?.address || "مصر، القاهرة"} | هاتف: {settings?.phone || "01012345678"} | البريد: {settings?.email || "info@alameed.eg"}
         </p>
-        <p className="mt-1">تم الطباعة: {new Date().toLocaleString("ar-LY")}</p>
+        <p className="mt-1">تم الطباعة: {new Date().toLocaleString("ar-EG")}</p>
       </div>
     </div>
   );

@@ -50,7 +50,7 @@ const InvoicePrint = forwardRef<HTMLDivElement, InvoicePrintProps>(
               </div>
             </div>
             <div className="mt-4 text-sm text-gray-600 space-y-1">
-              <p>{companySettings?.address || "ليبيا، طرابلس"}</p>
+              <p>{companySettings?.address || "مصر، القاهرة"}</p>
               <p>هاتف: {companySettings?.phone || "غير محدد"}</p>
               <p>البريد: {companySettings?.email || "غير محدد"}</p>
               {companySettings?.tax_number && (
@@ -92,9 +92,9 @@ const InvoicePrint = forwardRef<HTMLDivElement, InvoicePrintProps>(
                 <td className="py-3 px-4 border-b">{index + 1}</td>
                 <td className="py-3 px-4 border-b font-medium">{item.name}</td>
                 <td className="py-3 px-4 border-b text-center">{item.qty}</td>
-                <td className="py-3 px-4 border-b text-left">{item.price.toLocaleString()} د.ل</td>
+                <td className="py-3 px-4 border-b text-left">{item.price.toLocaleString()} ج.م</td>
                 <td className="py-3 px-4 border-b text-left font-semibold">
-                  {(item.qty * item.price).toLocaleString()} د.ل
+                  {(item.qty * item.price).toLocaleString()} ج.م
                 </td>
               </tr>
             ))}
@@ -106,23 +106,23 @@ const InvoicePrint = forwardRef<HTMLDivElement, InvoicePrintProps>(
           <div className="w-80 space-y-2">
             <div className="flex justify-between py-2 border-b">
               <span className="text-gray-600">المجموع الفرعي</span>
-              <span className="font-semibold">{subtotal.toLocaleString()} د.ل</span>
+              <span className="font-semibold">{subtotal.toLocaleString()} ج.م</span>
             </div>
             {invoice.discount !== 0 && (
               <div className={`flex justify-between py-2 border-b ${invoice.discount > 0 ? 'text-green-600' : 'text-red-600'}`}>
                 <span>خصم الصكوك</span>
                 <span className="font-semibold">
-                  {invoice.discount > 0 ? '-' : '+'} {Math.abs(invoice.discount).toLocaleString()} د.ل
+                  {invoice.discount > 0 ? '-' : '+'} {Math.abs(invoice.discount).toLocaleString()} ج.م
                 </span>
               </div>
             )}
             <div className="flex justify-between py-2 border-b">
               <span className="text-gray-600">الضريبة</span>
-              <span className="font-semibold">{invoice.tax.toLocaleString()} د.ل</span>
+              <span className="font-semibold">{invoice.tax.toLocaleString()} ج.م</span>
             </div>
             <div className="flex justify-between py-3 bg-blue-600 text-white px-4 rounded-lg">
               <span className="font-bold text-lg">الإجمالي المستحق</span>
-              <span className="font-bold text-lg">{invoice.total.toLocaleString()} د.ل</span>
+              <span className="font-bold text-lg">{invoice.total.toLocaleString()} ج.م</span>
             </div>
           </div>
         </div>

@@ -33,7 +33,7 @@ interface ReportItem {
 }
 
 const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat("ar-LY", {
+  return new Intl.NumberFormat("ar-EG", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
@@ -69,7 +69,7 @@ const ReportCard = ({
               </span>
             </div>
             <span className="font-semibold text-foreground">
-              {formatCurrency(item.value)} د.ل
+              {formatCurrency(item.value)} ج.م
             </span>
           </div>
         ))}
@@ -212,12 +212,12 @@ const DailyReport = () => {
     message += `📈 *ملخص اليوم:*\n`;
     message += `• عدد الفواتير: ${invoices?.length || 0}\n`;
     message += `• عدد الإيصالات: ${receipts?.length || 0}\n`;
-    message += `• إجمالي المبيعات: ${formatCurrency(totalSales)} د.ل\n`;
-    message += `• إجمالي الإيصالات: ${formatCurrency(totalReceipts)} د.ل\n\n`;
+    message += `• إجمالي المبيعات: ${formatCurrency(totalSales)} ج.م\n`;
+    message += `• إجمالي الإيصالات: ${formatCurrency(totalReceipts)} ج.م\n\n`;
     
     message += `💰 *الإجماليات:*\n`;
-    message += `• الخزينة: ${formatCurrency(treasury)} د.ل\n`;
-    message += `• الأرباح: ${formatCurrency(profit)} د.ل\n\n`;
+    message += `• الخزينة: ${formatCurrency(treasury)} ج.م\n`;
+    message += `• الأرباح: ${formatCurrency(profit)} ج.م\n\n`;
     
     message += `---\nشركة العميد الاردني`;
     
@@ -234,12 +234,12 @@ const DailyReport = () => {
     body += `ملخص اليوم:\n`;
     body += `• عدد الفواتير: ${invoices?.length || 0}\n`;
     body += `• عدد الإيصالات: ${receipts?.length || 0}\n`;
-    body += `• إجمالي المبيعات: ${formatCurrency(totalSales)} د.ل\n`;
-    body += `• إجمالي الإيصالات: ${formatCurrency(totalReceipts)} د.ل\n\n`;
+    body += `• إجمالي المبيعات: ${formatCurrency(totalSales)} ج.م\n`;
+    body += `• إجمالي الإيصالات: ${formatCurrency(totalReceipts)} ج.م\n\n`;
     
     body += `الإجماليات:\n`;
-    body += `• الخزينة: ${formatCurrency(treasury)} د.ل\n`;
-    body += `• الأرباح: ${formatCurrency(profit)} د.ل\n\n`;
+    body += `• الخزينة: ${formatCurrency(treasury)} ج.م\n`;
+    body += `• الأرباح: ${formatCurrency(profit)} ج.م\n\n`;
     
     body += `---\nشركة العميد الاردني`;
     

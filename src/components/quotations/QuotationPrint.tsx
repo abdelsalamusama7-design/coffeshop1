@@ -16,7 +16,7 @@ interface QuotationPrintProps {
 const QuotationPrint = forwardRef<HTMLDivElement, QuotationPrintProps>(
   ({ quotation, companySettings }, ref) => {
     const formatDate = (dateString: string) => {
-      return new Date(dateString).toLocaleDateString("ar-LY", {
+      return new Date(dateString).toLocaleDateString("ar-EG", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -128,8 +128,8 @@ const QuotationPrint = forwardRef<HTMLDivElement, QuotationPrintProps>(
                   <tr key={index}>
                     <td className="p-2 border">{item.item_name}</td>
                     <td className="p-2 border text-center">{item.quantity}</td>
-                    <td className="p-2 border text-center">{item.unit_price.toFixed(2)} د.ل</td>
-                    <td className="p-2 border text-center">{item.total.toFixed(2)} د.ل</td>
+                    <td className="p-2 border text-center">{item.unit_price.toFixed(2)} ج.م</td>
+                    <td className="p-2 border text-center">{item.total.toFixed(2)} ج.م</td>
                   </tr>
                 ))}
               </tbody>
@@ -142,23 +142,23 @@ const QuotationPrint = forwardRef<HTMLDivElement, QuotationPrintProps>(
           <div className="w-64 text-sm">
             <div className="flex justify-between py-2 border-b">
               <span>المجموع الفرعي:</span>
-              <span className="font-semibold">{quotation.subtotal.toFixed(2)} د.ل</span>
+              <span className="font-semibold">{quotation.subtotal.toFixed(2)} ج.م</span>
             </div>
             {quotation.discount > 0 && (
               <div className="flex justify-between py-2 border-b text-green-600">
                 <span>الخصم:</span>
-                <span className="font-semibold">-{quotation.discount.toFixed(2)} د.ل</span>
+                <span className="font-semibold">-{quotation.discount.toFixed(2)} ج.م</span>
               </div>
             )}
             {quotation.tax > 0 && (
               <div className="flex justify-between py-2 border-b">
                 <span>الضريبة:</span>
-                <span className="font-semibold">{quotation.tax.toFixed(2)} د.ل</span>
+                <span className="font-semibold">{quotation.tax.toFixed(2)} ج.م</span>
               </div>
             )}
             <div className="flex justify-between py-3 bg-primary/10 px-2 rounded font-bold text-lg">
               <span>الإجمالي:</span>
-              <span>{quotation.total.toFixed(2)} د.ل</span>
+              <span>{quotation.total.toFixed(2)} ج.م</span>
             </div>
           </div>
         </div>
