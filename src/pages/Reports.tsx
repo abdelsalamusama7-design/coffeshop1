@@ -77,7 +77,7 @@ const Reports = () => {
   const { products } = useProducts();
   const { receipts } = useReceipts();
 
-  const today = new Date().toLocaleDateString("ar-LY", {
+  const today = new Date().toLocaleDateString("ar-EG", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -101,7 +101,7 @@ const Reports = () => {
         message += `📈 *تقرير المبيعات اليومي*\n`;
         message += `━━━━━━━━━━━━━━━\n`;
         message += `عدد الفواتير: ${todayInvoices.length}\n`;
-        message += `إجمالي المبيعات: ${todaySales.toLocaleString()} د.ل\n`;
+        message += `إجمالي المبيعات: ${todaySales.toLocaleString()} ج.م\n`;
         break;
       case "inventory":
         message += `📦 *تقرير المخزون*\n`;
@@ -127,8 +127,8 @@ const Reports = () => {
       case "revenue":
         message += `💰 *تقرير الإيرادات*\n`;
         message += `━━━━━━━━━━━━━━━\n`;
-        message += `إجمالي الإيصالات: ${totalReceipts.toLocaleString()} د.ل\n`;
-        message += `إجمالي المبيعات: ${invoices?.reduce((sum, i) => sum + i.total, 0)?.toLocaleString() || 0} د.ل\n`;
+        message += `إجمالي الإيصالات: ${totalReceipts.toLocaleString()} ج.م\n`;
+        message += `إجمالي المبيعات: ${invoices?.reduce((sum, i) => sum + i.total, 0)?.toLocaleString() || 0} ج.م\n`;
         break;
     }
 

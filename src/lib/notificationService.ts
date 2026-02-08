@@ -32,7 +32,7 @@ export const createSystemNotification = async (
 export const notifyInvoiceCreated = (userId: string, invoiceNumber: string, customerName: string, total: number) => {
   return createSystemNotification(userId, {
     title: "فاتورة جديدة",
-    message: `تم إنشاء الفاتورة ${invoiceNumber} للعميل ${customerName} بمبلغ ${total.toLocaleString()} د.ل`,
+    message: `تم إنشاء الفاتورة ${invoiceNumber} للعميل ${customerName} بمبلغ ${total.toLocaleString()} ج.م`,
     type: "success",
     link: "/invoices",
   });
@@ -41,7 +41,7 @@ export const notifyInvoiceCreated = (userId: string, invoiceNumber: string, cust
 export const notifyReceiptCreated = (userId: string, receiptNumber: string, customerName: string, amount: number) => {
   return createSystemNotification(userId, {
     title: "إيصال قبض جديد",
-    message: `تم إنشاء الإيصال ${receiptNumber} من ${customerName} بمبلغ ${amount.toLocaleString()} د.ل`,
+    message: `تم إنشاء الإيصال ${receiptNumber} من ${customerName} بمبلغ ${amount.toLocaleString()} ج.م`,
     type: "success",
     link: "/receipts",
   });

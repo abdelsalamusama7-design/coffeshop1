@@ -132,8 +132,8 @@ const Quotations = () => {
     const message = encodeURIComponent(
       `مرحباً ${quotation.customer_name}،\n\n` +
       `نرفق لكم عرض السعر رقم: ${quotation.quotation_number}\n` +
-      `الإجمالي: ${quotation.total.toFixed(2)} د.ل\n\n` +
-      `شركة المراقب لكاميرات المراقبة\n` +
+      `الإجمالي: ${quotation.total.toFixed(2)} ج.م\n\n` +
+      `شركة العميد الاردني\n` +
       `${settings?.phone || ""}`
     );
     
@@ -154,7 +154,7 @@ const Quotations = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("ar-LY", {
+    return new Date(dateString).toLocaleDateString("ar-EG", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -218,7 +218,7 @@ const Quotations = () => {
               <CardTitle className="text-sm text-muted-foreground">إجمالي القيمة</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{totalValue.toFixed(0)} د.ل</p>
+              <p className="text-2xl font-bold">{totalValue.toFixed(0)} ج.م</p>
             </CardContent>
           </Card>
         </div>
@@ -279,7 +279,7 @@ const Quotations = () => {
                           {quotation.camera_count} × {quotation.camera_type}
                         </span>
                       </TableCell>
-                      <TableCell className="font-semibold">{quotation.total.toFixed(2)} د.ل</TableCell>
+                      <TableCell className="font-semibold">{quotation.total.toFixed(2)} ج.م</TableCell>
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -327,7 +327,7 @@ const Quotations = () => {
                             <DropdownMenuItem onClick={() => {
                               const customer = customers.find(c => c.id === quotation.customer_id);
                               const subject = `عرض سعر رقم ${quotation.quotation_number} - ${quotation.customer_name}`;
-                              const body = `عرض سعر رقم: ${quotation.quotation_number}\nالعميل: ${quotation.customer_name}\nالكاميرات: ${quotation.camera_count} × ${quotation.camera_type}\nالإجمالي: ${quotation.total.toLocaleString()} د.ل\n\n---\nشركة المراقب لكاميرات المراقبة`;
+                              const body = `عرض سعر رقم: ${quotation.quotation_number}\nالعميل: ${quotation.customer_name}\nالكاميرات: ${quotation.camera_count} × ${quotation.camera_type}\nالإجمالي: ${quotation.total.toLocaleString()} ج.م\n\n---\nشركة العميد الاردني`;
                               window.location.href = `mailto:${customer?.email || ""}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
                               toast.success("تم فتح البريد الإلكتروني");
                             }}>

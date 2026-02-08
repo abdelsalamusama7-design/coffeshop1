@@ -33,7 +33,7 @@ const ReceiptPrint = forwardRef<HTMLDivElement, ReceiptPrintProps>(
       const thousands = ["", "ألف", "ألفان", "ثلاثة آلاف", "أربعة آلاف", "خمسة آلاف", "ستة آلاف", "سبعة آلاف", "ثمانية آلاف", "تسعة آلاف"];
       
       if (num === 0) return "صفر";
-      if (num >= 10000) return `${num.toLocaleString()} دينار ليبي`;
+      if (num >= 10000) return `${num.toLocaleString()} جنيه مصري`;
       
       const th = Math.floor(num / 1000);
       const h = Math.floor((num % 1000) / 100);
@@ -46,7 +46,7 @@ const ReceiptPrint = forwardRef<HTMLDivElement, ReceiptPrintProps>(
       if (t > 0) result += tens[t] + " و";
       if (o > 0) result += ones[o];
       
-      return result.replace(/ و$/, "") + " دينار ليبي فقط لا غير";
+      return result.replace(/ و$/, "") + " جنيه مصري فقط لا غير";
     };
 
     return (
@@ -91,7 +91,7 @@ const ReceiptPrint = forwardRef<HTMLDivElement, ReceiptPrintProps>(
           <div className="mb-6">
             <p className="text-sm text-gray-600 mb-1">المبلغ رقماً</p>
             <p className="text-3xl font-bold text-green-600 bg-green-50 p-4 rounded-lg text-center">
-              {receipt.amount.toLocaleString()} دينار ليبي
+              {receipt.amount.toLocaleString()} جنيه مصري
             </p>
           </div>
 
@@ -138,7 +138,7 @@ const ReceiptPrint = forwardRef<HTMLDivElement, ReceiptPrintProps>(
         {/* Footer */}
         <div className="mt-8 pt-6 border-t-2 border-gray-300 text-center text-sm text-gray-500">
           <p>
-            {companySettings?.address || "ليبيا، طرابلس"} | هاتف: {companySettings?.phone || "غير محدد"} | البريد: {companySettings?.email || "غير محدد"}
+            {companySettings?.address || "مصر، القاهرة"} | هاتف: {companySettings?.phone || "غير محدد"} | البريد: {companySettings?.email || "غير محدد"}
           </p>
           {companySettings?.tax_number && (
             <p className="mt-1">الرقم الضريبي: {companySettings.tax_number}</p>

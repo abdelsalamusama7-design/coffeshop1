@@ -387,7 +387,7 @@ const Inventory = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>سعر البيع (د.ل)</Label>
+                      <Label>سعر البيع (ج.م)</Label>
                       <Input
                         type="number"
                         value={newProduct.price}
@@ -396,7 +396,7 @@ const Inventory = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>التكلفة (د.ل)</Label>
+                      <Label>التكلفة (ج.م)</Label>
                       <Input
                         type="number"
                         value={newProduct.cost}
@@ -472,8 +472,8 @@ const Inventory = () => {
                           {product.category}
                         </span>
                       </TableCell>
-                      <TableCell className="font-semibold">{product.price.toLocaleString()} د.ل</TableCell>
-                      <TableCell className="text-muted-foreground">{product.cost.toLocaleString()} د.ل</TableCell>
+                      <TableCell className="font-semibold">{product.price.toLocaleString()} ج.م</TableCell>
+                      <TableCell className="text-muted-foreground">{product.cost.toLocaleString()} ج.م</TableCell>
                       <TableCell>
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -544,11 +544,11 @@ const Inventory = () => {
             <div className="stat-card">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl gradient-warning flex items-center justify-center">
-                  <span className="text-lg font-bold text-primary-foreground">د.ل</span>
+                  <span className="text-lg font-bold text-primary-foreground">ج.م</span>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">قيمة المخزون</p>
-                  <p className="text-2xl font-bold">{totalValue.toLocaleString()} د.ل</p>
+                  <p className="text-2xl font-bold">{totalValue.toLocaleString()} ج.م</p>
                 </div>
               </div>
             </div>
@@ -591,10 +591,10 @@ const Inventory = () => {
                   <TableRow key={product.id} className="table-row-hover">
                     <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell>{product.category}</TableCell>
-                    <TableCell>{product.cost.toLocaleString()} ر.س</TableCell>
+                    <TableCell>{product.cost.toLocaleString()} ج.م</TableCell>
                     <TableCell>{product.stock}</TableCell>
                     <TableCell className="font-semibold">
-                      {(product.stock * product.cost).toLocaleString()} ر.س
+                      {(product.stock * product.cost).toLocaleString()} ج.م
                     </TableCell>
                     <TableCell>
                       <span

@@ -24,7 +24,7 @@ const Index = () => {
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-4 md:mb-6">
         <StatCard
           title="إجمالي المبيعات"
-          value="١٢٥,٤٣٠ د.ل"
+          value="١٢٥,٤٣٠ ج.م"
           change="+١٢.٥% من الشهر الماضي"
           changeType="positive"
           icon={DollarSign}

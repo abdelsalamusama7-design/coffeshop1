@@ -99,7 +99,7 @@ const POS = () => {
     onSuccess: () => {
       toast({
         title: "تم البيع بنجاح",
-        description: `المجموع: ${cartTotal.toFixed(2)} ر.س`,
+        description: `المجموع: ${cartTotal.toFixed(2)} ج.م`,
       });
       setCart([]);
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -296,7 +296,7 @@ const POS = () => {
                         {product.name}
                       </h3>
                       <p className="text-lg font-bold text-primary">
-                        {product.price.toFixed(2)} ر.س
+                        {product.price.toFixed(2)} ج.م
                       </p>
                       {hasPermission("can_view_cost") && (
                         <p className="text-xs text-muted-foreground">
@@ -344,7 +344,7 @@ const POS = () => {
                       </h4>
                       <p className="text-xs text-muted-foreground">
                         {item.price.toFixed(2)} × {item.quantity} ={" "}
-                        {(item.price * item.quantity).toFixed(2)} ر.س
+                        {(item.price * item.quantity).toFixed(2)} ج.م
                       </p>
                     </div>
                     <div className="flex items-center gap-1">
@@ -385,13 +385,13 @@ const POS = () => {
           <div className="p-4 border-t border-border space-y-3">
             <div className="flex justify-between text-foreground">
               <span>المجموع:</span>
-              <span className="font-bold text-lg">{cartTotal.toFixed(2)} ر.س</span>
+              <span className="font-bold text-lg">{cartTotal.toFixed(2)} ج.م</span>
             </div>
             {hasPermission("can_view_cost") && (
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">الربح:</span>
                 <span className="font-medium text-success">
-                  +{cartProfit.toFixed(2)} ر.س
+                  +{cartProfit.toFixed(2)} ج.م
                 </span>
               </div>
             )}
