@@ -11,6 +11,7 @@ import WorkerRoute from "@/components/auth/WorkerRoute";
 import NotificationProvider from "@/components/notifications/NotificationProvider";
 
 // صفحات النظام الأصلي (للأدمن)
+import Home from "./pages/Home";
 import Index from "./pages/Index";
 import Inventory from "./pages/Inventory";
 import Invoices from "./pages/Invoices";
@@ -43,8 +44,18 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <Routes>
-                {/* الصفحة الرئيسية - توجيه لصفحة تسجيل الدخول */}
-                <Route path="/" element={<Navigate to="/auth" replace />} />
+                {/* الصفحة الرئيسية - عرض الأقسام */}
+                <Route path="/" element={<Navigate to="/home" replace />} />
+                
+                {/* صفحة الأقسام والمنتجات */}
+                <Route
+                  path="/home"
+                  element={
+                    <WorkerRoute>
+                      <Home />
+                    </WorkerRoute>
+                  }
+                />
                 
                 {/* صفحة تسجيل الدخول الموحدة */}
                 <Route path="/auth" element={<Auth />} />

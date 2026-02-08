@@ -491,6 +491,54 @@ export type Database = {
         }
         Relationships: []
       }
+      product_ingredients: {
+        Row: {
+          cost_per_unit: number
+          created_at: string
+          id: string
+          ingredient_name: string
+          ingredient_product_id: string | null
+          product_id: string
+          quantity_per_unit: number
+          updated_at: string
+        }
+        Insert: {
+          cost_per_unit?: number
+          created_at?: string
+          id?: string
+          ingredient_name: string
+          ingredient_product_id?: string | null
+          product_id: string
+          quantity_per_unit?: number
+          updated_at?: string
+        }
+        Update: {
+          cost_per_unit?: number
+          created_at?: string
+          id?: string
+          ingredient_name?: string
+          ingredient_product_id?: string | null
+          product_id?: string
+          quantity_per_unit?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_ingredients_ingredient_product_id_fkey"
+            columns: ["ingredient_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_ingredients_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category: string
@@ -498,11 +546,14 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          image_url: string | null
+          is_prepared: boolean | null
           min_stock: number
           name: string
           price: number
           sku: string | null
           stock: number
+          unit: string | null
           updated_at: string
         }
         Insert: {
@@ -511,11 +562,14 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          image_url?: string | null
+          is_prepared?: boolean | null
           min_stock?: number
           name: string
           price?: number
           sku?: string | null
           stock?: number
+          unit?: string | null
           updated_at?: string
         }
         Update: {
@@ -524,11 +578,14 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          image_url?: string | null
+          is_prepared?: boolean | null
           min_stock?: number
           name?: string
           price?: number
           sku?: string | null
           stock?: number
+          unit?: string | null
           updated_at?: string
         }
         Relationships: []

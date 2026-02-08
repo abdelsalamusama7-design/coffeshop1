@@ -5,6 +5,7 @@ export type AppRole = "admin" | "user" | "sales" | "technical" | "supervisor" | 
 export const rolePermissions: Record<AppRole, string[]> = {
   admin: [
     "/",
+    "/home",
     "/dashboard",
     "/inventory",
     "/invoices",
@@ -16,6 +17,7 @@ export const rolePermissions: Record<AppRole, string[]> = {
   ],
   supervisor: [
     "/",
+    "/home",
     "/dashboard",
     "/inventory",
     "/invoices",
@@ -25,6 +27,7 @@ export const rolePermissions: Record<AppRole, string[]> = {
   ],
   sales_manager: [
     "/",
+    "/home",
     "/dashboard",
     "/inventory",
     "/invoices",
@@ -34,6 +37,7 @@ export const rolePermissions: Record<AppRole, string[]> = {
   ],
   financial_manager: [
     "/",
+    "/home",
     "/dashboard",
     "/invoices",
     "/customers",
@@ -42,6 +46,7 @@ export const rolePermissions: Record<AppRole, string[]> = {
   ],
   accountant: [
     "/",
+    "/home",
     "/dashboard",
     "/invoices",
     "/customers",
@@ -50,6 +55,7 @@ export const rolePermissions: Record<AppRole, string[]> = {
   ],
   sales: [
     "/",
+    "/home",
     "/dashboard",
     "/invoices",
     "/customers",
@@ -57,12 +63,14 @@ export const rolePermissions: Record<AppRole, string[]> = {
   ],
   technical: [
     "/",
+    "/home",
     "/dashboard",
     "/inventory",
     "/profile",
   ],
   maintenance: [
     "/",
+    "/home",
     "/dashboard",
     "/inventory",
     "/profile",
