@@ -69,7 +69,7 @@ const DailyReportPrint = ({
           <img src={logo} alt="الشعار" className="w-14 h-14 object-contain" />
         </div>
         <h1 className="text-xl font-bold text-gray-900">
-          {settings?.company_name || "شركة المراقب"}
+          {settings?.company_name || "شركة العميد الاردني"}
         </h1>
         <p className="text-sm text-gray-600">
           {settings?.address || "لكاميرات المراقبة والأنظمة الأمنية"}

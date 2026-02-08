@@ -57,7 +57,7 @@ const ReceiptPrint = forwardRef<HTMLDivElement, ReceiptPrintProps>(
             <img src={logo} alt="الشعار" className="w-16 h-16 object-contain" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">
-            {companySettings?.company_name || "شركة المراقب"}
+            {companySettings?.company_name || "شركة العميد الاردني"}
           </h1>
           <p className="text-sm text-gray-600">لكاميرات المراقبة والأنظمة الأمنية</p>
           <h2 className="text-2xl font-bold text-green-600 mt-4">إيصال قبض</h2>

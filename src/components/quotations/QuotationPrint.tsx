@@ -43,7 +43,7 @@ const QuotationPrint = forwardRef<HTMLDivElement, QuotationPrintProps>(
             <img src={logo} alt="الشعار" className="w-20 h-20 object-contain" />
             <div>
               <h1 className="text-xl font-bold text-gray-800">
-                {companySettings?.company_name || "شركة المراقب لكاميرات المراقبة"}
+                {companySettings?.company_name || "شركة العميد الاردني"}
               </h1>
               <p className="text-sm text-gray-600">{companySettings?.address}</p>
               <p className="text-sm text-gray-600">هاتف: {companySettings?.phone}</p>
@@ -184,7 +184,7 @@ const QuotationPrint = forwardRef<HTMLDivElement, QuotationPrintProps>(
 
         {/* Footer */}
         <div className="text-center text-sm text-gray-500 border-t pt-4">
-          <p>{companySettings?.company_name || "شركة المراقب لكاميرات المراقبة"}</p>
+          <p>{companySettings?.company_name || "شركة العميد الاردني"}</p>
           <p>الرقم الضريبي: {companySettings?.tax_number}</p>
         </div>
       </div>

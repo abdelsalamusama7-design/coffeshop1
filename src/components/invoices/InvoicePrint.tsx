@@ -44,7 +44,7 @@ const InvoicePrint = forwardRef<HTMLDivElement, InvoicePrintProps>(
               <img src={logo} alt="الشعار" className="w-14 h-14 object-contain" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {companySettings?.company_name || "شركة المراقب"}
+                  {companySettings?.company_name || "شركة العميد الاردني"}
                 </h1>
                 <p className="text-sm text-gray-600">لكاميرات المراقبة والأنظمة الأمنية</p>
               </div>
@@ -147,7 +147,7 @@ const InvoicePrint = forwardRef<HTMLDivElement, InvoicePrintProps>(
           </div>
           <div className="text-center mt-6 text-gray-500 text-sm">
             <p>شكراً لتعاملكم معنا</p>
-            <p>{companySettings?.company_name || "شركة المراقب لكاميرات المراقبة"}</p>
+            <p>{companySettings?.company_name || "شركة العميد الاردني"}</p>
           </div>
         </div>
       </div>

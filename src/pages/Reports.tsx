@@ -92,7 +92,7 @@ const Reports = () => {
   const totalReceipts = receipts?.reduce((sum, r) => sum + r.amount, 0) || 0;
 
   const generateReportMessage = (reportType: string) => {
-    const companyName = settings?.company_name || "شركة المراقب";
+    const companyName = settings?.company_name || "شركة العميد الاردني";
     let message = `📊 *${companyName}*\n`;
     message += `📅 التاريخ: ${today}\n\n`;
 
@@ -152,7 +152,7 @@ const Reports = () => {
       printWindow.document.write(`
         <html dir="rtl">
           <head>
-            <title>تقرير - ${settings?.company_name || "شركة المراقب"}</title>
+            <title>تقرير - ${settings?.company_name || "شركة العميد الاردني"}</title>
             <style>
               @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
               body {

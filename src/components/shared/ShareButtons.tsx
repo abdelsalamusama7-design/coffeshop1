@@ -90,7 +90,7 @@ const generateWhatsAppMessage = (data: ShareData, type: string): string => {
     message += `\n\n📝 ملاحظات: ${data.notes}`;
   }
   
-  message += `\n\n---\nشركة المراقب لكاميرات المراقبة`;
+  message += `\n\n---\nشركة العميد الاردني`;
   
   return message;
 };
@@ -166,7 +166,7 @@ const generateEmailBody = (data: ShareData, type: string): string => {
     body += `\n\nملاحظات: ${data.notes}`;
   }
   
-  body += `\n\n---\nشركة المراقب لكاميرات المراقبة`;
+  body += `\n\n---\nشركة العميد الاردني`;
   
   return body;
 };
