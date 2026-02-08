@@ -92,9 +92,9 @@ const MobileSidebar = () => {
         <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <img src={logo} alt="المراقب" className="w-10 h-10 rounded-xl object-contain" />
+              <img src={logo} alt="العميد الاردني" className="w-10 h-10 rounded-xl object-contain" />
               <div>
-                <h1 className="text-base font-bold text-sidebar-foreground">المراقب</h1>
+                <h1 className="text-base font-bold text-sidebar-foreground">العميد الاردني</h1>
                 <p className="text-xs text-sidebar-foreground/60">نظام إدارة المبيعات</p>
               </div>
             </div>

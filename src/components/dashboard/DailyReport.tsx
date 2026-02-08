@@ -219,7 +219,7 @@ const DailyReport = () => {
     message += `• الخزينة: ${formatCurrency(treasury)} د.ل\n`;
     message += `• الأرباح: ${formatCurrency(profit)} د.ل\n\n`;
     
-    message += `---\nشركة المراقب لكاميرات المراقبة`;
+    message += `---\nشركة العميد الاردني`;
     
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank");
     toast.success("تم فتح واتساب للمشاركة");
@@ -241,7 +241,7 @@ const DailyReport = () => {
     body += `• الخزينة: ${formatCurrency(treasury)} د.ل\n`;
     body += `• الأرباح: ${formatCurrency(profit)} د.ل\n\n`;
     
-    body += `---\nشركة المراقب لكاميرات المراقبة`;
+    body += `---\nشركة العميد الاردني`;
     
     window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     toast.success("تم فتح البريد الإلكتروني");

@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const systemPrompt = `أنت مساعد ذكي لنظام المراقب لإدارة المبيعات وكاميرات المراقبة. 
+const systemPrompt = `أنت مساعد ذكي لنظام العميد الاردني لإدارة المبيعات. 
 مهمتك مساعدة المسؤولين والمديرين والمشرفين في:
 
 1. **إدارة المخزون**: شرح كيفية إضافة المنتجات، تتبع المخزون، وتنبيهات نقص المخزون
